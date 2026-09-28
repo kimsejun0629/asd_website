@@ -1,0 +1,64 @@
+/* 인재채용 쪽 스타일: 채용 공고(js/careers.js가 채움) · 직무 · 성장 · 근무지 · 복리후생 · 전형 절차. careers.html · careers-en.html 공용
+   site.css 뒤의 막는 <link>(scroll-fx가 처음 계산된 스타일을 읽음)
+   탭 순서대로 구역 배경이 번갈아 옴: 채용 공고(어두움) → 직무(밝음) → 성장(어두움) → 근무지(밝음) → 복리후생(어두움) → 전형 절차(밝음)
+   두 면에서 값만 바뀌는 선 · 보조 글 색은 구역 토큰(--ln · --sub, site.css 4) — 끝의 규칙은 두 면의 값이 토큰과 다른 복리후생 줄만 */
+/* 채용 공고 */
+/* 제목을 히어로로 옮긴 뒤 첫 본문은 공통 좌우 여백에서 시작 */
+.sec[data-hero-label]>.main{grid-column:1/-1;margin-top:0}
+.sec[data-hero-label]>:is(.grow,.sites,.bens){margin-top:0}
+.jobs{grid-column:1/-1;margin-top:72px;display:flex;flex-direction:column;box-shadow:inset 0 1px 0 var(--line2)}
+.job{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:var(--gut);align-items:center;min-height:112px;padding:20px 8px;box-shadow:inset 0 -1px 0 var(--line)}
+.job .st{grid-column:1/span 2;display:flex;align-items:center;gap:10px;font-size:13px;font-weight:700}
+.job .st i{width:8px;height:8px;border-radius:50%;background:var(--gold)}
+.job.closed .st i{background:var(--rose)}
+.job.closed .st,.job.closed .t{color:var(--cream80)}
+.job .t{grid-column:3/span 6;font-size:clamp(19px,1.6vw,24px);line-height:1.4;letter-spacing:-.015em}
+.job .ty{grid-column:9/span 2;font-size:14px;color:var(--cream80);line-height:1.6}
+.job .go{grid-column:11/span 2;justify-self:end;display:flex;align-items:center;gap:10px;font-size:14px;font-weight:700}
+.jnote{grid-column:1/-1;margin-top:28px;display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap;font-size:14px;color:var(--cream80)}
+/* 직무 · 성장 */
+.roles{grid-column:1/-1;margin-top:72px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));column-gap:var(--gut)}
+.role{padding-top:24px;box-shadow:inset 0 1px 0 var(--night);display:flex;flex-direction:column;gap:16px}
+.role .k{font-size:13px;font-weight:700;letter-spacing:var(--ls-lbl);text-transform:uppercase;color:var(--ink80)}
+.role .t{font-size:clamp(26px,2.4vw,36px);letter-spacing:-.03em}
+.role p{font-size:15.5px;line-height:1.75;color:var(--ink80)}
+.grow{grid-column:1/-1;margin-top:72px;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:var(--gut);row-gap:40px}
+.grow .q{grid-column:1/span 6;font-size:clamp(22px,2.2vw,32px);line-height:1.5;letter-spacing:-.02em}
+.grow .b{grid-column:8/span 5}
+.prog{grid-column:1/-1;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));column-gap:var(--gut)}
+.prog div{box-shadow:inset 0 1px 0 var(--line2);padding-top:18px;display:flex;flex-direction:column;gap:8px}
+.prog b{font-size:17px;font-weight:700}
+.prog span{font-size:13px;color:var(--cream80)}
+/* 근무지 · 복리후생 · 전형 절차 · 문의 */
+.sites{grid-column:1/-1;margin-top:64px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));column-gap:var(--gut)}
+.site{box-shadow:inset 0 1px 0 var(--ln);padding-top:22px;display:flex;flex-direction:column;gap:12px}
+.site .n{font-size:26px;letter-spacing:-.02em}
+.site .r{font-size:15px;color:var(--sub);line-height:1.6}
+.bens{grid-column:1/-1;margin-top:72px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));column-gap:var(--gut);row-gap:48px}
+.ben{box-shadow:inset 0 1px 0 var(--night);padding-top:22px;display:flex;flex-direction:column;gap:16px}
+.ben .n{font-size:24px;letter-spacing:-.02em}
+.ben ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px;font-size:15px;line-height:1.55;color:var(--sub)}
+.ben li{display:grid;grid-template-columns:14px minmax(0,1fr);gap:8px}
+.ben li::before{content:"";width:10px;height:1px;background:var(--night);margin-top:.8em}
+.steps{grid-column:1/-1;margin-top:72px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));column-gap:0;counter-reset:s}
+.step{position:relative;padding:28px 24px 0 0;box-shadow:inset 0 1px 0 var(--ln);display:flex;flex-direction:column;gap:12px}
+.step::before{counter-increment:s;content:"0" counter(s);font-size:13px;font-weight:700;color:var(--sub)}
+.step::after{content:"";position:absolute;left:0;top:-4px;width:9px;height:9px;border-radius:50%;background:var(--gold)}
+.step b{font-size:clamp(22px,2vw,30px);font-weight:300;letter-spacing:-.02em}
+.step span{font-size:14px;color:var(--sub);line-height:1.6}
+.cta{grid-column:1/-1;margin-top:120px;padding:56px;display:flex;justify-content:space-between;align-items:center;gap:32px;flex-wrap:wrap;box-shadow:inset 0 0 0 1px var(--ln)}
+.cta .h{font-size:clamp(26px,2.6vw,40px);letter-spacing:-.03em}
+.cta p{margin-top:12px;font-size:15px;color:var(--sub)}
+@media (max-width:1100px){.roles{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:40px}.bens{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:900px){
+  .job{grid-template-columns:1fr auto;row-gap:10px;padding:22px 4px}
+  .job .st{grid-column:1/-1}.job .t{grid-column:1/-1}.job .ty{grid-column:1}.job .go{grid-column:2}
+  .roles,.bens,.sites{grid-template-columns:1fr;row-gap:32px}
+  .grow .q,.grow .b{grid-column:1/-1}
+  .prog{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:24px}
+  .steps{grid-template-columns:1fr;row-gap:28px}
+  .cta{padding:28px}
+}
+/* 복리후생이 어두운 구역일 때: 윗선 · 점선(밝은 면의 --night 대신) */
+.sec:not(.light) .ben{box-shadow:inset 0 1px 0 var(--line2)}
+.sec:not(.light) .ben li::before{background:var(--cream80)}

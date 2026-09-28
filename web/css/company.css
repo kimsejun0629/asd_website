@@ -1,0 +1,50 @@
+/* 회사소개 쪽 스타일: 인사말 · 본부 소개 · 연혁 머리말 · 사업장. company.html · company-en.html 공용
+   site.css → history.css 뒤의 막는 <link>(scroll-fx가 처음 계산된 스타일을 읽음). 영문 전용 규칙은 끝에 :where(html[lang="en"]) */
+/* 인사말 */
+.quote{font-size:calc(clamp(28px,3.1vw,46px) - 2px);line-height:1.34;letter-spacing:-.03em}
+.quote b{font-weight:700;font-size:calc(1em + 2px);line-height:1}  /* 강조(굵게)는 본문보다 2px 크게 */
+.gbody{margin-top:64px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:40px;row-gap:24px}
+.sign{margin-top:64px;display:flex;align-items:center;gap:32px;padding-top:32px;box-shadow:inset 0 1px 0 var(--line2)}
+.sign .who{display:flex;flex-direction:column;gap:8px}
+.sign .who span{font-size:14px;color:var(--cream80)}
+.sign .who b{font-size:22px;font-weight:700;letter-spacing:.02em}
+.sign img{height:64px;width:auto}
+/* 본부 소개: 세 기둥 · 숫자 */
+.pillars{grid-column:1/-1;margin-top:96px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));column-gap:var(--gut)}
+.pillar{padding-top:28px;box-shadow:inset 0 1px 0 var(--night);display:flex;flex-direction:column;gap:14px}
+.pillar .k{font-size:13px;font-weight:700;letter-spacing:var(--ls-lbl);text-transform:uppercase}
+.pillar .t{font-size:clamp(26px,2.6vw,40px);letter-spacing:-.03em;line-height:1.1}
+.pillar ul{margin:8px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px;font-size:16px;color:var(--ink80)}
+.pillar li{display:flex;gap:10px;align-items:center}
+.pillar li::before{content:"";width:12px;height:1px;background:var(--night)}
+.stats{grid-column:1/-1;margin-top:120px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));column-gap:var(--gut)}
+.stat{box-shadow:inset 0 1px 0 var(--lineK);padding-top:24px;display:flex;flex-direction:column;gap:18px}
+.stat .l{font-size:14px;color:var(--ink80)}
+.stat .v{display:flex;align-items:baseline;gap:6px}
+.stat .v b{font-weight:300;font-size:clamp(44px,5vw,76px);line-height:1;letter-spacing:var(--ls-num);white-space:nowrap}
+.stat .v span{font-size:18px;color:var(--ink80)}
+.note{grid-column:1/-1;margin-top:28px;font-size:13px;color:var(--ink80)}
+/* 연혁 머리말(가로 타임라인은 history.css) · 사업장 */
+.hist-intro{grid-column:5/span 8}
+.locs{grid-column:1/-1;margin-top:80px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));column-gap:var(--gut)}
+.loc{display:flex;flex-direction:column;gap:22px}
+.loc .fr{aspect-ratio:722/440;overflow:hidden;background:var(--cblue)}
+.loc .fr img{width:100%;height:100%;object-fit:cover;display:block;filter:grayscale(1) invert(.88) contrast(.92) brightness(.95);transition:transform var(--t-img)}
+.loc:hover .fr img{transform:scale(1.035)}
+.loc .n{font-size:30px;letter-spacing:-.025em}
+.loc ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px;font-size:16px}
+.loc ul li{display:flex;gap:10px;align-items:center}
+.loc ul li::before{content:"";width:12px;height:1px;background:var(--night)}
+.loc .addr{padding-top:16px;box-shadow:inset 0 1px 0 var(--lineK);font-size:15px;line-height:1.6;color:var(--ink80);display:flex;justify-content:space-between;gap:16px;align-items:flex-start}
+.loc .addr a{flex-shrink:0;font-size:14px;font-weight:700;color:var(--night)}
+@media (max-width:900px){
+  .gbody{grid-template-columns:1fr;margin-top:40px}
+  .pillars,.locs{grid-template-columns:1fr;row-gap:40px}
+  .stats{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:32px;margin-top:72px}
+  .stat .v{flex-wrap:wrap;row-gap:2px}
+  .stat .v b{font-size:clamp(38px,11vw,56px)}
+  .hist-intro{grid-column:1/-1;margin-top:24px}
+}
+/* 영문: 라틴 글자는 자간을 덜 좁힘 */
+:where(html[lang="en"]) .quote{letter-spacing:-.02em}
+:where(html[lang="en"]) .loc .n{letter-spacing:-.015em}

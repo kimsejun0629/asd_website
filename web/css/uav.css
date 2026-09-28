@@ -1,0 +1,166 @@
+/* 무인기 페이지 전용 스타일 — uav.html · uav-en.html이 css/site.css 바로 뒤에 불러옴(캐스케이드 순서의 일부라 규칙 순서를 바꾸지 말 것).
+   #seq 무대(js/uav*.js가 채움) · 브로슈어 구역. 끝에 영문 조판(:where로 특이도 그대로), 맨 끝에 #seq 등장 규칙(이 파일에만 있음)
+   머리 영상은 site.css 11(.ph.pv), 브로슈어 버튼 줄(.uav-act)은 site.css 16 · 무대 그래픽 색(SVG)은 js/uav-kit.js */
+
+/* ── 무대 · 장면 SVG ── */
+#seq{position:relative;height:calc(9 * 280vh + var(--read-extra,0px))}   /* 기본 장 길이 + 설명 후반 감속 거리(uav.js) */
+.stage{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;background:var(--night)}
+#scene{position:absolute;inset:0;width:100%;height:100%;display:block}
+/* 투명도 0이라 보이지 않는 것은 그리지 않음: 숨은 장(층) · 그림자 · 연기(흐림 필터) — WebKit은 투명도 0이어도 필터까지 매 프레임 다시 그림 */
+/* 속성 글자와 맞물림: js/uav-kit.js op()는 toFixed(3)("0.000"), 숨은 층은 setAttribute('opacity',0)("0")로 씀 — 자릿수를 바꾸면 이 규칙이 조용히 풀림 */
+#scene>g>g[opacity="0"],#scene>g>g[opacity="0.000"],#scene [opacity="0"]>[filter],#scene [opacity="0.000"]>[filter],#scene [filter][opacity="0"],#scene [filter][opacity="0.000"]{display:none}
+.scrim{position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgb(var(--night-rgb) / .86) 0,rgb(var(--night-rgb) / .55) 28%,rgb(var(--night-rgb) / 0) 46%),linear-gradient(0deg,rgb(var(--night-rgb) / .7) 0,rgb(var(--night-rgb) / 0) 26%)}
+/* ── 장면 라벨(js/uav.js tag · flushTags) ── */
+.labels{position:absolute;inset:0;pointer-events:none}
+.tag{position:absolute;left:0;top:0;display:flex;align-items:center;gap:10px;font-size:12px;font-weight:700;white-space:nowrap;color:var(--cream);will-change:transform,opacity}
+.tag::before{content:"";width:18px;height:1px;background:var(--cream)}
+.tag.l{flex-direction:row-reverse}
+.tag.big{font-size:14px}
+.tag em{font-style:normal;font-weight:300;color:var(--cream80)}
+/* ── 기체 그림: 첫 화면 아이소 → 지도 위 탑뷰로 착지 ── */
+.plates{position:absolute;inset:0;pointer-events:none}
+.plate{position:absolute;left:58%;top:52%;will-change:transform,opacity}
+.plate{perspective:1600px}
+.plate .iso{display:block;width:auto;height:auto;max-width:min(58vw,940px);max-height:min(60vh,calc(100svh - 360px));transform-origin:50% 60%;will-change:transform,opacity}
+.plate .top{position:absolute;left:50%;top:50%;max-width:none;max-height:none;opacity:0;will-change:transform,opacity}
+/* ── 글 층: 장 설명(.cht) · 특징 ── */
+.ovl{position:absolute;inset:0;pointer-events:none}
+.cht,.phases,.spec,.rail,.ispec{text-shadow:0 0 14px rgb(var(--shade-rgb) / .55),0 1px 2px rgb(var(--shade-rgb) / .3)}
+.cht{position:absolute;left:var(--m);top:calc(var(--hdr) + 48px);width:min(520px,42vw)}
+.cht .no{display:flex;gap:18px;align-items:center;color:var(--cream80)}
+.cht h2{margin-top:28px;font-size:clamp(40px,5vw,72px);line-height:1.02;letter-spacing:var(--ls-h1)}
+.cht .en{margin-top:18px;color:var(--cream80)}
+.cht .mission{margin-top:28px;font-size:20px;line-height:1.45;letter-spacing:-.015em}
+.cht .mission b{font-weight:700;font-size:calc(1em + 2px);line-height:1}  /* 강조(굵게)는 본문보다 2px 크게 */
+.feats{margin-top:30px;display:flex;flex-direction:column}
+.feat{display:grid;grid-template-columns:22px minmax(0,1fr);column-gap:10px;padding:12px 0 13px;box-shadow:inset 0 1px 0 var(--line)}
+.feat:last-child{box-shadow:inset 0 1px 0 var(--line),inset 0 -1px 0 var(--line)}
+.feat i{display:block;width:14px;height:1px;background:var(--gold);margin-top:10px}
+.feat b{display:block;font-size:16px;font-weight:700;letter-spacing:-.01em;line-height:1.35}
+.feat span{display:block;margin-top:4px;font-size:13.5px;line-height:1.55;color:var(--cream80)}
+.cht .tagc{display:inline-flex;margin-left:12px;padding:3px 8px;font-size:11px;font-weight:700;letter-spacing:.04em;color:var(--cream80);box-shadow:inset 0 0 0 1px var(--line2)}
+/* 창 높이가 모자랄 때만 스크립트가 필요한 단계까지 붙이는 압축 규칙 (왼쪽: 체계 설명·임무 단계 / 오른쪽: 목차·제원) */
+.stage.m-all .phs{display:grid!important}.stage.m-all .phs .d{max-height:none!important;transition:none!important}
+.stage.f1 .feat{padding:9px 0 10px}.stage.f1 .feat span{margin-top:2px;font-size:13px}.stage.f1 .cht .mission{margin-top:20px}.stage.f1 .feats{margin-top:22px}.stage.f1 .cht h2{font-size:clamp(40px,4.4vw,62px)}
+.stage.f2 .feat span{display:none}
+.stage.f3 .feats{display:none}
+.stage.f4 .phs .d{display:none}
+.stage.f5 .phs:not(.on){display:none}.stage.f5 .phs .d{display:block}
+.stage.f6 .cht h2{margin-top:18px;font-size:clamp(32px,3.4vw,46px)}.stage.f6 .cht .en{margin-top:12px}.stage.f6 .cht .mission{margin-top:14px;font-size:16px}
+.stage.f7 .phases{display:none}
+.stage.r1 .rail .cap{display:none}.stage.r1 .rail .axis{top:0}.stage.r1 .rail a{height:28px}
+.stage.r2 .rail a{height:22px;font-size:12px}.stage.r2 .spec .r{padding:7px 0}.stage.r2 .spec .src{margin-top:6px}
+.stage.r3 .rail{display:none}
+/* ── 임무 단계 ── */
+.phases{position:absolute;left:var(--m);bottom:calc(44px + var(--sab));width:min(440px,40vw);display:flex;flex-direction:column}
+.phs{display:grid;grid-template-columns:36px minmax(0,1fr);column-gap:8px;padding:14px 0 12px;position:relative;color:var(--cream80);transition:color var(--t-ui)}
+.phs .n{font-size:12px;font-weight:700;padding-top:3px}
+.phs .k{font-size:17px;letter-spacing:-.01em}
+.phs .d{grid-column:2;font-size:13px;line-height:1.55;margin-top:6px;max-height:0;overflow:hidden;opacity:0;transition:max-height .5s var(--ease-roll),opacity .4s var(--ease-std)}
+.phs::before{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:var(--line)}
+.phs i{position:absolute;left:0;bottom:0;height:1px;background:var(--gold);width:0}
+.phs.on{color:var(--cream)}
+.phs.on .k{font-weight:700}
+.phs.on .d{max-height:60px;opacity:1}
+.phs.done{color:var(--cream80)}
+/* 설명은 빠르게 또렷해지고, 기존 진행선은 스크롤 거리에 반응 */
+.slow-phases .phs .d{transition-duration:.2s,.2s}
+/* ── 목차(운용고도 순) ── */
+.rail{position:absolute;right:var(--m);top:calc(var(--hdr) + 48px);display:flex;flex-direction:column;align-items:flex-end;gap:0;pointer-events:auto}
+.rail .cap{margin-bottom:18px;color:var(--cream80)}
+.rail a{display:flex;align-items:center;gap:14px;height:34px;font-size:13px;white-space:nowrap;color:var(--cream80);transition:color var(--t-ui)}
+.rail a i{display:block;width:10px;height:1px;background:var(--line2);transition:width var(--t-line),background-color .3s}
+.rail a.on{color:var(--cream);font-weight:700}
+.rail a.on i{width:32px;background:var(--gold)}
+.rail a:hover{color:var(--cream)}
+.rail .axis{position:absolute;right:-18px;top:36px;bottom:0;width:1px;background:var(--line)}
+.rail .axis b{position:absolute;left:0;top:0;width:1px;background:var(--gold);height:0}
+/* ── 제원 표(오른쪽) · 어둡게 · 큰 이름 · 첫 화면 제원 줄(.ispec → 제원 표로 모핑) ── */
+.specs{position:absolute;right:var(--m);bottom:calc(44px + var(--sab));width:300px}
+.spec{position:absolute;right:0;bottom:0;width:300px;display:flex;flex-direction:column}
+.spec .h{padding-bottom:12px;color:var(--cream80)}
+.spec .r{display:flex;justify-content:space-between;gap:16px;padding:10px 0;box-shadow:inset 0 1px 0 var(--line);font-size:13px}
+.spec .r span:first-child{color:var(--cream80)}
+.spec .r span:last-child{font-weight:700;text-align:right}
+.spec .src{margin-top:10px;font-size:11px;color:var(--cream80)}
+.dim{position:absolute;inset:0;background:var(--night);pointer-events:none;opacity:0}
+.giants{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.giant{position:absolute;left:0;right:0;top:54%;text-align:center;font-weight:300;letter-spacing:-.065em;line-height:.8;color:var(--cream);white-space:nowrap;opacity:0;will-change:opacity,transform}
+.ispec{position:absolute;left:var(--m);right:var(--m);bottom:calc(40px + var(--sab));display:grid;grid-template-columns:repeat(var(--n,5),minmax(0,1fr));column-gap:var(--gut);transform-origin:0 0;opacity:0;will-change:transform,opacity;pointer-events:none}
+.ispec.tight .it:nth-child(n+3){display:none}
+.ispec .it{box-shadow:inset 0 1px 0 var(--line2);padding-top:16px;display:flex;flex-direction:column;gap:12px}
+.ispec .k{font-size:13px;color:var(--cream80)}
+.ispec .v{font-size:30px;line-height:1.15;letter-spacing:-.03em}
+.ispec .src{grid-column:1/-1;margin-top:14px;font-size:11px;color:var(--cream80)}
+
+/* ── 브로슈어 구역(.sec 기본은 site.css) ── */
+.sec .side{padding-top:14px}
+
+/* ── 휴대폰 · 좁은 창 ── */
+@media (max-width:900px){
+  .scrim{background:linear-gradient(180deg,rgb(var(--night-rgb) / .9) 0,rgb(var(--night-rgb) / .5) 30%,rgb(var(--night-rgb) / 0) 48%),linear-gradient(0deg,rgb(var(--night-rgb) / .92) 0,rgb(var(--night-rgb) / 0) 30%)}
+  .cht{top:calc(var(--hdr) + 24px);width:auto;right:var(--m)}
+  .cht h2{margin-top:16px;font-size:38px}
+  .cht .en{margin-top:12px}
+  .cht .mission{margin-top:14px;font-size:15px}
+  .feats{display:none}
+  .phases{width:auto;right:var(--m);bottom:calc(24px + var(--sab))}
+  .phs{display:none}
+  .phs.on{display:grid}
+  .rail,.specs{display:none}
+  .ispec{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:18px;bottom:calc(24px + var(--sab))}
+  .ispec .v{font-size:20px}
+  .ispec .it:nth-child(n+5){display:none}
+  .plate{left:50%;top:52%}
+  .plate .iso{max-width:92vw;max-height:min(36vh,calc(100svh - 500px))}
+  .tag{font-size:11px}
+  .tag::before{width:12px}
+  .sec{padding:96px var(--m);grid-template-columns:1fr}
+  .sec .side{grid-column:1/-1}
+}
+/* 세로가 짧은 휴대폰(예: 375×667): 첫 화면 제원을 조금 더 촘촘하게 */
+@media (max-width:900px) and (orientation:portrait) and (max-height:720px){
+  .ispec{row-gap:12px}.ispec .it{padding-top:12px;gap:8px}.ispec .v{font-size:17px}.ispec .src{display:none}
+}
+/* 좁은 데스크톱 창(901~1180px): 설명 칼럼을 조금 좁히고, 기체 이미지와 큰 이름을 오른쪽 빈 곳으로 옮겨 글과 겹치지 않게 */
+@media (min-width:901px) and (max-width:1180px){
+  .stage{--plx:.64}
+  .cht{width:min(520px,38vw)}
+  .phases{width:min(440px,38vw)}
+  .plate .iso{max-width:36vw}
+  .giants{transform:translateX(14%)}
+}
+/* 가로로 눕힌 휴대폰: 좌측 설명 + 우측 장면(데스크톱식 배치)을 작게 */
+@media (max-width:900px) and (orientation:landscape) and (max-height:520px){
+  .stage{--plx:.66;--gk:.34}
+  .scrim{background:linear-gradient(90deg,rgb(var(--night-rgb) / .9) 0,rgb(var(--night-rgb) / .6) 34%,rgb(var(--night-rgb) / 0) 56%),linear-gradient(0deg,rgb(var(--night-rgb) / .75) 0,rgb(var(--night-rgb) / 0) 30%)}
+  .cht{top:calc(var(--hdr) + 14px);right:auto;width:min(46vw,400px)}
+  .cht h2{margin-top:8px;font-size:26px}
+  .cht .en{margin-top:8px;font-size:10px}
+  .cht .mission{margin-top:10px;font-size:12px;line-height:1.5}
+  .phases{right:auto;width:min(46vw,400px);bottom:calc(12px + var(--sab))}
+  .phs{padding:10px 0 9px}.phs .k{font-size:14px}.phs .d{font-size:12px;margin-top:4px}
+  .ispec{grid-template-columns:repeat(4,minmax(0,1fr));column-gap:16px;row-gap:0;bottom:calc(12px + var(--sab))}
+  .ispec .it{padding-top:8px;gap:4px}.ispec .k{font-size:11px}.ispec .v{font-size:15px}.ispec .src{display:none}
+  .plate .iso{max-width:36vw;max-height:46vh}
+  .giant{top:68%}
+}
+
+/* ── 브로슈어 구역 출처 안내 ── */
+.uav-note{margin-top:56px;padding-top:20px;box-shadow:inset 0 1px 0 var(--lineK);font-size:13px;line-height:1.7;color:var(--ink80);max-width:720px}
+
+/* ── 영문 조판(uav-en.html만): 국문 규칙 뒤 · 특이도는 그대로(:where) — 가로 휴대폰에서도 영문은 32px · 14px ── */
+:where(html[lang="en"]) .cht h2{font-size:clamp(32px,3.6vw,52px);line-height:1.04;letter-spacing:-.03em}
+:where(html[lang="en"]) .cht .mission{font-size:18px;letter-spacing:-.01em}
+:where(html[lang="en"]) .feat b{letter-spacing:0}
+:where(html[lang="en"]) .phs .k{letter-spacing:0}
+:where(html[lang="en"]) .giant{letter-spacing:-.05em}
+@media (max-width:900px){:where(html[lang="en"]) .cht h2{font-size:32px}:where(html[lang="en"]) .cht .mission{font-size:14px}}
+
+/* ── #seq 등장 효과(맨 끝에 둘 것): 예전에 js/scroll-fx.js가 실행 중 <head> 끝에 넣던 <style>을 옮긴 것 — 이 파일이 유일한 사본.
+   html.rv · .rvs · .rv-in · --dl은 scroll-fx.js가 붙임. 장면 글 전환의 .9s · 1s · .8s는 이 자리만의 길이 ── */
+html.rv #seq .rvs>:not(.feats),html.rv #seq .rvs .feat{transition:opacity .9s var(--rv-ease) var(--dl,0s),filter .9s var(--rv-ease) var(--dl,0s),transform 1s var(--rv-ease) var(--dl,0s),color .3s var(--rv-ease)}
+html.rv #seq .rvs:not(.rv-in)>:not(.feats),html.rv #seq .rvs:not(.rv-in) .feat{opacity:0;filter:blur(10px);transform:translateY(16px);transition-duration:.2s;transition-delay:0s}
+html.rv .stage.f5 .rvs.rv-in>.phs.on{animation:rvphs .8s var(--rv-ease) both}
+@keyframes rvphs{from{opacity:0;filter:blur(8px);transform:translateY(12px)}to{opacity:1;filter:none;transform:none}}
+html.rv .stage.f5 .slow-phases.rv-in>.phs.on{animation-duration:.2s}

@@ -1,0 +1,11 @@
+<!doctype html><html><body style="margin:0;background:#222">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.min.js"}}</script>
+<canvas id="c" width="800" height="450"></canvas>
+<script type="module">
+import * as THREE from 'three';
+const r=new THREE.WebGLRenderer({canvas:document.getElementById('c'),antialias:true});
+const s=new THREE.Scene();const cam=new THREE.PerspectiveCamera(40,800/450,.1,100);cam.position.set(3,2,4);cam.lookAt(0,0,0);
+const m=new THREE.Mesh(new THREE.TorusKnotGeometry(1,.3,200,32),new THREE.MeshPhysicalMaterial({color:0x76bee6,roughness:.3,clearcoat:1}));s.add(m);
+s.add(new THREE.HemisphereLight(0xffffff,0x444444,1.5));const d=new THREE.DirectionalLight(0xffffff,2);d.position.set(3,5,2);s.add(d);
+r.render(s,cam);window.done=r.capabilities.isWebGL2?'webgl2':'webgl1';
+</script></body></html>

@@ -1,0 +1,70 @@
+{
+ "settle_ignore": [
+  ".fl-track",
+  ".pk-prog",
+  ".a3-co"
+ ],
+ "pix_hide": [
+  "video",
+  "canvas",
+  ".fl-track",
+  ".a3-co",
+  "#seq #scene",
+  "#seq #labels",
+  "#seq #giants",
+  "#seq #plates",
+  ".hero .scue-l"
+ ],
+ "pix_tol": 1,
+ "pix_zones": [
+  {
+   "sel": ".hx-card",
+   "tol": 24,
+   "why": "연혁 카드: 멈출 때 마지막 프레임을 건너뛰어(|p-lastP|<.00005) 가운데 카드가 translate 0.1px · scale 0.9999만큼 실행마다 달라짐 → 글자 가장자리 4~5단계"
+  }
+ ],
+ "margin_if_same_box": true,
+ "attr_subs": [
+  {
+   "attr": "style",
+   "re": "(--dl?):\\s*-?[\\d.]+s",
+   "to": "\\1:*",
+   "why": "순차 등장 지연(--d · --dl)은 판정 시각에 따라 달라짐"
+  }
+ ],
+ "rules": [
+  {
+   "why": "메인 스트립은 시간에 따라 흐름(80초 한 바퀴): 트랙 transform · 인라인 style · 안 카드들의 x 위치",
+   "label": "\\.fl-track(\\.|$)",
+   "subtree": true,
+   "kinds": [
+    "^r\\.xy$",
+    "^s:transform$",
+    "^a:style$"
+   ]
+  },
+  {
+   "why": "3D 설명선: 카메라가 시간에 따라 천천히 흔들림(sin(time))",
+   "label": "\\.a3-c(\\.|$)",
+   "subtree": true,
+   "kinds": [
+    "^r\\.xy$",
+    "^s:transform$",
+    "^a:style$"
+   ]
+  },
+  {
+   "why": "순차 등장 지연(--d)이 transition-delay로 풀림",
+   "attr": {
+    "style": "--d:"
+   },
+   "subtree": true,
+   "kinds": [
+    "^[sbfmh]:transition-delay$"
+   ]
+  }
+ ],
+ "console_ignore": [],
+ "url_ignore": [],
+ "auto": {}
+}

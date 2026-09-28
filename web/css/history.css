@@ -1,0 +1,90 @@
+/* 연혁 가로 타임라인(회사소개 #history · js/history.js가 --ly · --cw · --ih · --iw와 상태 클래스를 씀) · 세로로 스크롤하면 연도가 옆으로 넘어가고, 가운데 연도가 가장 크고 선명하게 보임
+   company.html · company-en.html이 site.css 뒤, company.css 앞에 불러옴. z-index 150 · 200은 무대 안 쌓임 */
+.hx{grid-column:1/-1;position:relative;margin:88px calc(var(--m) * -1) 0}
+.hx-stage{position:sticky;top:var(--hdr);height:calc(100svh - var(--hdr) - var(--sab));overflow:hidden;touch-action:pan-y;-webkit-user-select:none;user-select:none;--ly:96px;--cw:420px;--ih:262px}
+.hx-stage::before,.hx-stage::after{content:"";position:absolute;top:0;bottom:0;z-index:150;width:clamp(14px,5vw,100px);pointer-events:none}
+.hx-stage::before{left:0;background:linear-gradient(90deg,var(--night),rgb(var(--night-rgb) / 0))}
+.hx-stage::after{right:0;background:linear-gradient(270deg,var(--night),rgb(var(--night-rgb) / 0))}
+.hx-stage.drag{cursor:grabbing}
+.hx-stage.drag .hx-card{cursor:grabbing}
+
+/* 윗줄: 지금 보고 있는 연대 · 순서 · 이전/다음 */
+.hx-top{position:absolute;left:var(--m);right:var(--m);top:26px;z-index:200;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.hx-era{color:var(--cream);white-space:nowrap;text-transform:none}
+.hx-nav{display:flex;align-items:center;gap:8px}
+.hx-count{margin-right:12px;font-size:13px;font-weight:700;letter-spacing:.08em;color:var(--cream80);white-space:nowrap;font-variant-numeric:tabular-nums}
+.hx-count b{font-weight:700;color:var(--cream)}
+.hx-arw{width:44px;height:44px;display:flex;align-items:center;justify-content:center;padding:0;background:none;border:0;color:var(--cream);box-shadow:inset 0 0 0 1px var(--line2);cursor:pointer;transition:box-shadow var(--t-ui),opacity var(--t-ui)}
+.hx-arw:hover{box-shadow:inset 0 0 0 1px var(--cream)}
+.hx-arw[disabled]{opacity:.28;cursor:default;box-shadow:inset 0 0 0 1px var(--line2)}
+.hx-hint{position:absolute;left:var(--m);top:62px;z-index:200;display:flex;align-items:center;gap:10px;font-size:13px;color:var(--cream80);white-space:nowrap;transition:opacity .5s var(--ease-std)}
+.hx-hint svg{flex:none}
+.hx-hint.off{opacity:0}
+/* 윗줄 · 안내 · 눈금자: 연혁 사진이 다 보일 때 흐림에서 또렷하게(history.js가 .in을 붙임) */
+.hx-top,.hx-hint,.hx-ruler{transition:opacity var(--t-rv) var(--d,0s),filter var(--t-rv) var(--d,0s),transform 1.2s var(--rv-ease) var(--d,0s)}
+.hx-hint{--d:.12s}.hx-ruler{--d:.24s}
+.hx:not(.in) :is(.hx-top,.hx-hint,.hx-ruler){opacity:0;filter:blur(10px);transform:translateY(16px);pointer-events:none}
+.hx.in .hx-hint.off{--d:0s}
+
+/* 연도를 잇는 선과 카드 */
+.hx-line{position:absolute;left:0;right:0;top:var(--ly);height:1px;background:var(--line2)}
+.hx-track{position:absolute;inset:0;margin:0;padding:0;list-style:none}
+.hx-track:focus-visible{outline:none}
+.hx-track:focus-visible .hx-card.on .hx-ph{outline:1px solid var(--gold);outline-offset:6px}
+.hx-card{position:absolute;left:50%;top:var(--ly);width:var(--cw);margin-left:calc(var(--cw) / -2);transform-origin:50% 0;opacity:0;pointer-events:none;cursor:pointer;backface-visibility:hidden}
+.hx-card.on{cursor:default}
+.hx-card::before{content:"";position:absolute;left:0;top:-5px;width:9px;height:9px;border-radius:50%;background:var(--night);box-shadow:inset 0 0 0 1px var(--cream80);transition:background-color var(--t-ui),box-shadow var(--t-ui)}
+.hx-card.on::before{background:var(--gold);box-shadow:inset 0 0 0 1px var(--gold),0 0 0 6px rgb(var(--gold-rgb) / .22)}
+/* 연도 점을 자기 레이어로(WebKit만) — 고리가 카드 밖으로 번져 전환마다 카드 레이어를 다시 할당하던 것을 막음 */
+@supports (font:-apple-system-body){.hx-card::before{will-change:transform}}
+.hx-y{display:block;margin:0;padding-top:22px;font-size:clamp(38px,calc(var(--cw) * .14),76px);font-weight:300;line-height:1;letter-spacing:var(--ls-num);color:var(--cream)}
+.hx-ph{position:relative;margin-top:20px;height:var(--ih);overflow:hidden;background:var(--cblue)}
+.hx-ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;opacity:0;transition:opacity .9s var(--ease-std)}
+.hx-ph img.on{opacity:1}
+.hx-ph .n{position:absolute;right:10px;bottom:10px;padding:3px 8px;font-size:11px;font-weight:700;letter-spacing:.06em;color:var(--cream);background:rgb(var(--night-rgb) / .72);font-variant-numeric:tabular-nums}
+/* 사진이 없는 해: 브랜드 패턴 위에 연도를 윤곽선으로 */
+.hx-ph.none{background:#2d3033}   /* 이 자리만 쓰는 판 색 */
+.hx-ph.none::before{content:"";position:absolute;inset:0;background:var(--cblue);opacity:.5;-webkit-mask:url("../img/pattern2d-hx.webp") 0 0/600px 450px no-repeat;mask:url("../img/pattern2d-hx.webp") 0 0/600px 450px no-repeat}
+.hx-ph.none span{position:absolute;right:7%;bottom:-.12em;font-size:calc(var(--cw) * .3);font-weight:700;line-height:1;letter-spacing:-.04em;color:transparent;-webkit-text-stroke:1px rgb(var(--cream-rgb) / .34)}
+.hx-ev{margin:18px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px;font-size:clamp(15px,calc(var(--cw) * .037),17px);line-height:1.55;color:var(--cream)}
+.hx-ev li{display:grid;grid-template-columns:14px minmax(0,1fr);column-gap:10px}
+.hx-ev li::before{content:"";width:14px;height:1px;margin-top:.8em;background:var(--gold)}
+
+/* 아래: 1975~2022 눈금자 · 연대 바로가기 */
+.hx-ruler{position:absolute;left:var(--m);right:var(--m);bottom:16px;z-index:200;height:50px;touch-action:none;cursor:pointer}
+.hx-axis{position:absolute;left:0;right:0;top:12px;height:1px;background:var(--line2)}
+.hx-tk{position:absolute;top:8px;width:1px;height:9px;margin-left:-.5px;background:rgb(var(--cream-rgb) / .36);pointer-events:none}
+.hx-tk.on{top:5px;height:15px;background:var(--gold)}
+.hx-mark{position:absolute;top:0;width:3px;height:25px;margin-left:-1.5px;background:var(--gold);pointer-events:none}
+.hx-dec{position:absolute;top:22px;height:28px;padding:0 6px;transform:translateX(-50%);background:none;border:0;font-size:12px;font-weight:700;letter-spacing:.08em;color:var(--cream80);white-space:nowrap;cursor:pointer;transition:color var(--t-ui)}
+.hx-dec.s{transform:none;padding-left:0}
+.hx-dec:hover,.hx-dec.on{color:var(--cream)}
+
+/* 세로가 낮은 창: 가로형 카드(사진 왼쪽 · 글 오른쪽) */
+.hx-stage.wide .hx-card{display:grid;grid-template-columns:var(--iw) minmax(0,1fr);grid-template-rows:auto 1fr;column-gap:28px;align-items:start}
+.hx-stage.wide .hx-ph{grid-column:1;grid-row:1/3;margin-top:20px}
+.hx-stage.wide .hx-y{grid-column:2;grid-row:1;font-size:clamp(32px,calc(var(--cw) * .072),58px)}
+.hx-stage.wide .hx-ev{grid-column:2;grid-row:2;margin-top:16px;font-size:15px}
+.hx-stage.wide .hx-ph.none span{font-size:calc(var(--iw) * .3)}
+.hx-card.dense .hx-ev{gap:4px;font-size:14px;line-height:1.42}
+.hx-stage.compact .hx-hint,.hx-stage.tiny .hx-hint{display:none}
+.hx-stage.compact .hx-top{top:12px}
+.hx-stage.tiny .hx-top{top:8px}
+.hx-stage.tiny .hx-arw{width:36px;height:36px}
+.hx-stage.tiny .hx-ruler{bottom:4px;height:22px}
+.hx-stage.tiny .hx-dec{display:none}
+.hx-stage.tiny .hx-y{padding-top:12px;font-size:clamp(28px,calc(var(--cw) * .06),40px)}
+.hx-stage.tiny .hx-ph{margin-top:12px}
+.hx-stage.tiny .hx-ev{margin-top:10px;gap:4px;font-size:14px;line-height:1.45}
+
+@media (max-width:900px){
+  .hx{margin-top:56px}
+  .hx-top{top:16px}
+  .hx-arw{width:40px;height:40px}
+  .hx-count{margin-right:6px}
+  .hx-hint{top:58px;font-size:12px}
+  .hx-ev li{grid-template-columns:12px minmax(0,1fr);column-gap:8px}
+  .hx-ev li::before{width:12px}
+}
+@media (max-width:600px){.hx-dec.s{display:none}}
+@media (prefers-reduced-motion:reduce){.hx-ph img,.hx-hint,.hx-card::before{transition:none}}

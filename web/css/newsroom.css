@@ -1,0 +1,54 @@
+/* 뉴스룸 쪽 스타일: 최신 소식 · 기사 목록 · 홍보영상 · 브로슈어(카드는 js/newsroom.js가 채움). newsroom.html · newsroom-en.html 공용
+   site.css 뒤의 막는 <link>(scroll-fx가 처음 계산된 스타일을 읽음). 영문 전용 규칙은 끝에 :where(html[lang="en"]) */
+/* 뉴스: 최신 소식 · 검색 도구 · 기사 목록 */
+.feat{grid-column:1/-1;min-width:0;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:var(--gut);align-items:end}
+.feat .fr,.feat .tx{min-width:0}
+.feat .fr{grid-column:1/span 7;aspect-ratio:16/10}
+.feat .tx{grid-column:9/span 4;display:flex;flex-direction:column;gap:22px;padding-bottom:8px}
+.meta{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--cream80)}
+.meta b{color:var(--cream);font-weight:700}
+.feat .t{font-size:clamp(24px,2.3vw,36px);line-height:1.35;letter-spacing:-.025em}
+.more{display:inline-flex;align-items:center;gap:12px;font-size:15px;font-weight:700}
+.tools{grid-column:1/-1;margin-top:120px;display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap;padding-bottom:24px;box-shadow:inset 0 -1px 0 var(--line2)}
+.tools .years{display:flex;gap:8px;flex-wrap:wrap}
+.search{display:flex;align-items:center;gap:12px;font-size:14px;font-weight:700}
+.search input{height:44px;width:260px;background:transparent;border:0;box-shadow:inset 0 -1px 0 var(--line2);color:var(--cream);font-size:15px;font-weight:300;padding:0 2px;outline-offset:6px}
+.search input::placeholder{color:var(--cream80)}
+.grid{grid-column:1/-1;margin-top:48px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));column-gap:var(--gut);row-gap:56px}
+.ncard{min-width:0;gap:18px}
+.ncard .fr{aspect-ratio:16/10}
+.ncard .t{font-size:19px;line-height:1.5;letter-spacing:-.01em}
+.ncard .ex{display:inline-flex;margin-left:6px;color:var(--cream80);vertical-align:1px}
+.empty{grid-column:1/-1;padding:64px 0;text-align:center;color:var(--cream80);font-size:16px}
+.pager{grid-column:1/-1;margin-top:64px;display:flex;justify-content:center}
+.pager .cnt{font-weight:300;color:var(--cream80)}
+/* 홍보영상(밝은 구역) · 브로슈어 */
+.vgrid{grid-column:1/-1;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));column-gap:var(--gut);row-gap:48px}
+.vcard{gap:16px}
+.vcard .fr{aspect-ratio:16/9;position:relative}
+.vcard .play{position:absolute;left:16px;bottom:16px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:rgb(var(--night-rgb) / .72);color:var(--cream);box-shadow:inset 0 0 0 1px rgb(var(--cream-rgb) / .5);transition:background-color var(--t-ui)}
+.vcard:hover .play{background:var(--night)}
+.vcard .t{font-size:17px;line-height:1.5;color:var(--night)}
+.vcard .d{font-size:13px;color:var(--ink80)}
+.bgrid{grid-column:1/-1;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));column-gap:var(--gut);row-gap:56px}
+.bro{display:flex;flex-direction:column;gap:16px}
+.bro .fr{aspect-ratio:4/3;overflow:hidden;background:var(--cblue)}
+.bro .fr img{width:100%;height:100%;object-fit:cover;display:block;transition:transform var(--t-img)}
+.bro:hover .fr img{transform:scale(1.035)}
+.bro .t{font-size:20px;letter-spacing:-.015em}
+.bro .e{font-size:13px;color:var(--cream80);margin-top:-8px}
+.bro .dl{display:flex;gap:8px;margin-top:4px}
+.bro .dl a{flex:1;height:44px;padding:0 14px;gap:10px;font-size:14px}
+@media (max-width:1100px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.vgrid,.bgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:900px){
+  .sec{grid-template-columns:minmax(0,1fr)}
+  .feat .fr,.feat .tx{grid-column:1/-1}.feat .tx{margin-top:20px}
+  .tools{margin-top:72px}.search input{width:100%}.search{flex:1}
+  .grid{grid-template-columns:minmax(0,1fr);row-gap:40px}
+  .vgrid,.bgrid{grid-template-columns:repeat(2,minmax(0,1fr));column-gap:12px;row-gap:32px}
+  .bro .dl{flex-direction:column}
+  .vcard .t,.bro .t{font-size:15px}
+}
+/* 영문: 제목만 번역 — 기사는 국문(KR 표시 · 안내 문구) */
+:where(html[lang="en"]) .kr-tag{display:inline-flex;margin-left:8px;padding:2px 7px;font-size:11px;font-weight:700;letter-spacing:.04em;color:var(--cream80);box-shadow:inset 0 0 0 1px var(--line2);vertical-align:2px}
+:where(html[lang="en"]) .lang-note{grid-column:1/-1;margin-bottom:24px;font-size:13px;color:var(--sub)}

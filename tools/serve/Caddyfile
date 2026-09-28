@@ -1,0 +1,23 @@
+# 사이트 미리보기 서버(Tailscale 외부 접속용) — web/을 루트로
+# 실행: caddy run --config tools/serve/Caddyfile --adapter caddyfile   (포트는 PORT 환경변수, 기본 8770)
+# 파이썬 간이 서버와 달리 부분 요청(Range)을 지원해 영상이 앞부분만 받고 바로 재생되고, 사파리(맥 · 아이폰)에서도 재생됨
+{
+	admin off
+}
+
+:{$PORT:8770} {
+	root * {$ROOT:/Users/kimsejun/Documents/projects/asd_website/web}
+	# 글 · 스크립트 · 스타일만 압축(영상 · 이미지 · 글꼴은 이미 압축돼 있어 그대로 — 부분 요청도 유지)
+	encode zstd gzip
+	# 매번 바뀌었는지만 확인(바뀌지 않았으면 304로 다시 받지 않음)
+	header Cache-Control "no-cache"
+	file_server
+	# 접속 기록(기기 · 요청 파일 · 응답 코드) — 외부 기기에서 재생이 안 될 때 원인 확인용
+	log {
+		output file {$HOME}/Library/Logs/asd-caddy-access.log {
+			roll_size 10MiB
+			roll_keep 3
+		}
+		format console
+	}
+}

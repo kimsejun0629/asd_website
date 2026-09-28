@@ -1,0 +1,6 @@
+<!doctype html><html><body style="margin:0;background:#fff"><canvas id="c" width="1000" height="500"></canvas>
+<script type="module">
+import {drawSym} from '../web/js/a3d-sym.js';
+const g=document.getElementById('c').getContext('2d');drawSym(g,250,250,200,'#051766');
+g.fillStyle='#53AAE2';g.fillRect(500,0,500,500);drawSym(g,750,250,200,'#051766');window.done=true;
+</script></body></html>

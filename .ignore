@@ -1,0 +1,15 @@
+# 검색(ripgrep · Grep · Glob) 기본 범위에서 뺌 — 경로를 직접 주면 여전히 검색 · 읽기 가능, 전부 보려면 rg --no-ignore
+# git 저장소가 아니어서 .gitignore는 적용되지 않음 → .ignore 사용
+# 기록 · 검증 결과 · 도구 출력 · 원본 자료
+_archive/
+_verification/
+_out/
+research/
+assets/
+# 현행이 아닌 도구(옛 포트 8766 · 옛 스냅샷 · 참고 사이트 · 한 줄짜리 큰 데이터 · 번들)는 모두 tools/_legacy/에 모음(docs/tools.md)
+tools/pylib/
+tools/_legacy/
+# Premiere 프로젝트 · macOS
+Adobe Premiere Pro*/
+*.prproj
+.DS_Store

@@ -1,0 +1,89 @@
+/* 항공기체 쪽 전용(aero.html · aero-en.html 공용): 기종별 3D 쇼케이스 #a3d(폰 · WebGL 없는 목록 포함).
+   site.css 뒤, 막는 <link>로 둠(scroll-fx.js가 시작할 때 계산된 스타일을 읽음). 156px · 900px 등은 js/a3d.js와 맞물림
+   핵심 이력(.bz-pf · .bz-act)은 site.css 16 — 3D(어두운 구역) 앞이라 밝은 구역에 두어 배경이 번갈아 오고, 색은 구역 토큰(--fg · --sub · --ln)이 맞춤 */
+/* ---------- 기종별 3D 쇼케이스(#a3d) ---------- */
+#a3d{position:relative;height:calc(var(--n) * 250vh + 100vh);height:calc(var(--n) * 250svh + 100svh);background:var(--night)}
+.a3-stage{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;background:radial-gradient(110% 85% at 60% 46%,#3a3e41 0,#2a2d30 34%,#1c1e20 78%,#17191a 100%)}   /* 스튜디오 배경 — 이 네 색은 이 자리만 */
+.a3-cv{position:absolute;inset:0;width:100%;height:100%;display:block}
+.a3-scrim{position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgb(var(--shade2-rgb) / .78) 0,rgb(var(--shade2-rgb) / .42) 27%,rgb(var(--shade2-rgb) / 0) 42%,rgb(var(--shade2-rgb) / 0) 80%,rgb(var(--shade2-rgb) / .62) 100%)}
+.a3-chs{position:absolute;left:var(--m);top:calc(var(--hdr) + 48px);width:min(440px,34vw);pointer-events:none}
+.a3-ch{position:absolute;left:0;top:0;width:100%;visibility:hidden}
+.a3-ch.on{visibility:visible}
+.a3-ch>*{opacity:0;filter:blur(10px);transform:translateY(16px);transition:opacity .6s var(--rv-ease),filter .6s var(--rv-ease),transform .7s var(--rv-ease)}
+.a3-ch.on>*{opacity:1;filter:none;transform:none;transition-duration:.9s,.9s,1s}
+.a3-ch.on>:nth-child(2){transition-delay:.1s}.a3-ch.on>:nth-child(3){transition-delay:.24s}
+.a3-ch .no{display:flex;gap:18px;color:var(--cream80)}
+.a3-ch h2{margin-top:24px;font-size:clamp(40px,4.6vw,72px);line-height:1.02;letter-spacing:var(--ls-h1);text-wrap:balance}
+.a3-ch .yr{margin-top:16px;color:var(--cream80)}
+/* 제작 부위 목록: 부위 단계에 들어서면 나타나고, 지금 설명 중인 부위가 밝게(나머지는 흐리게 · 지난 부위는 번호만 금색) */
+.a3-ch .pl{margin:30px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;pointer-events:auto}
+.a3-ch .pl li{display:flex;align-items:center;gap:12px;padding:12px 0;box-shadow:inset 0 -1px 0 var(--line);font-size:17px;letter-spacing:-.01em;color:var(--cream80);cursor:pointer;opacity:0;transform:translateY(12px);filter:blur(6px);transition:opacity .5s var(--rv-ease),transform .6s var(--rv-ease),filter .5s var(--rv-ease),color .4s var(--ease-std)}
+.a3-ch .pl li i{flex:none;display:grid;place-items:center;width:24px;height:24px;border-radius:50%;box-shadow:inset 0 0 0 1px var(--gold);color:var(--gold-hi);font-size:11px;font-weight:700;font-style:normal;font-variant-numeric:tabular-nums;transition:background-color .4s,color .4s}
+.a3-ch .pl li.on{color:var(--cream)}.a3-ch .pl li.on i{background:var(--gold);color:var(--night)}
+.a3-ch .pl li.done i{background:rgb(var(--gold-rgb) / .35);color:var(--cream)}
+.a3-ch .pl li:focus-visible{outline:1px solid var(--gold);outline-offset:2px}
+.a3-ch.fo .pl li{opacity:1;transform:none;filter:none;transition-duration:.8s,.9s,.8s,.4s}
+.a3-ch:not(.fo) .pl{pointer-events:none}
+.a3-ch.fo .pl li:nth-child(2){transition-delay:.1s}.a3-ch.fo .pl li:nth-child(3){transition-delay:.2s}.a3-ch.fo .pl li:nth-child(4){transition-delay:.3s}
+.a3-ch .nt{margin-top:16px;font-size:14px;line-height:1.5;color:var(--cream80);opacity:0;transition:opacity .6s var(--rv-ease) .3s}
+.a3-ch.fo .nt{opacity:1}
+.a3-ch .fb{display:none}
+/* 설명선: 부위 자리의 점 → 45° 짧은 선 → 가로선 → 번호 · 이름(부위 하나씩, 기체 중심 반대쪽으로) */
+.a3-co{position:absolute;inset:0;pointer-events:none}
+.a3-c{position:absolute;left:0;top:0;width:0;height:0;opacity:0;transition:opacity .45s var(--rv-ease)}
+.a3-c.on{opacity:1}
+.a3-c .dt{position:absolute;left:-5px;top:-5px;width:10px;height:10px;border-radius:50%;background:var(--gold-hi);box-shadow:0 0 0 4px rgb(var(--gold-rgb) / .3),0 0 14px rgb(var(--gold-hi-rgb) / .7)}
+.a3-c .ln{position:absolute;left:0;top:0;width:150px;height:44px;transform:translateY(-100%);background:linear-gradient(var(--cream),var(--cream)) 44px 0/0 1px no-repeat;opacity:.6;transition:background-size .5s var(--rv-ease) .15s}
+.a3-c .ln::before{content:"";position:absolute;left:0;bottom:0;width:62px;height:1px;background:var(--cream);transform-origin:0 50%;transform:rotate(-45deg) scaleX(0);transition:transform .35s var(--rv-ease)}
+.a3-c.on .ln{background-size:106px 1px}.a3-c.on .ln::before{transform:rotate(-45deg) scaleX(1)}
+.a3-c span{position:absolute;left:156px;top:-44px;transform:translateY(-50%) translateX(-8px);display:flex;align-items:center;gap:10px;padding:5px 12px 5px 5px;border-radius:20px;background:rgb(var(--shade-rgb) / .62);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);font-size:13.5px;font-weight:700;white-space:nowrap;color:var(--cream);text-shadow:0 0 12px rgb(var(--shade-rgb) / .7);opacity:0;transition:opacity .2s var(--rv-ease) .1s,transform .25s var(--rv-ease) .1s}
+.a3-c span i{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--gold);color:var(--night);font-size:11.5px;font-style:normal;font-variant-numeric:tabular-nums;text-shadow:none}
+.a3-c.on span{opacity:1;transform:translateY(-50%)}
+.a3-c.l .ln{left:auto;right:0;transform:translateY(-100%) scaleX(-1)}
+.a3-c.l span{left:auto;right:156px;flex-direction:row-reverse;padding:5px 5px 5px 12px}
+.a3-c.up .ln{transform:scaleY(-1)}.a3-c.up span{top:44px}
+.a3-c.l.up .ln{transform:scale(-1,-1)}
+/* 방위 눈금(회전 중 기체 방향 · 부위 단계에서는 부위 번호) */
+.a3-hdg{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);width:min(480px,60vw);display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--cream80);transition:opacity .5s}
+.a3-hdg .tw{position:relative;width:100%;height:16px;overflow:hidden;-webkit-mask:linear-gradient(90deg,transparent,#000 22%,#000 78%,transparent);mask:linear-gradient(90deg,transparent,#000 22%,#000 78%,transparent)}
+.a3-hdg .tp{position:absolute;left:50%;top:0;width:10000px;height:100%;margin-left:-2880px;background:repeating-linear-gradient(90deg,rgb(var(--cream-rgb) / .55) 0 1px,transparent 1px 20px),repeating-linear-gradient(90deg,rgb(var(--cream-rgb) / .9) 0 1px,transparent 1px 120px);background-size:auto 7px,auto 14px;background-repeat:repeat-x;background-position:0 100%,0 100%}
+.a3-hdg .ct{width:1px;height:10px;margin-top:-12px;background:var(--gold-hi)}
+.a3-hdg b{font-size:11.5px;font-weight:700;letter-spacing:var(--ls-lbl);font-variant-numeric:tabular-nums;color:var(--cream);white-space:nowrap}   /* WebKit이 글자 폭을 1~2px 좁게 잡아 "PART 02 / 04"가 두 줄로 깜박이는 일 방지 */
+.a3-hdg.a3-pt .tw,.a3-hdg.a3-pt .ct{opacity:.35}
+/* 기종 바로가기 */
+.a3-rail{position:absolute;right:var(--m);top:calc(var(--hdr) + 48px);display:flex;flex-direction:column;align-items:flex-end}
+.a3-rail .cap{margin-bottom:14px;color:var(--cream80)}
+.a3-rail a{display:flex;align-items:center;gap:14px;height:32px;font-size:13px;white-space:nowrap;color:var(--cream80);transition:color var(--t-ui)}
+.a3-rail a i{display:block;width:10px;height:1px;background:var(--line2);transition:width var(--t-line),background-color .3s}
+.a3-rail a.on{color:var(--cream);font-weight:700}.a3-rail a.on i{width:32px;background:var(--gold)}.a3-rail a:hover{color:var(--cream)}
+.a3-hint{position:absolute;left:var(--m);bottom:24px;max-width:26ch;font-size:12.5px;line-height:1.5;color:var(--cream80);transition:opacity .5s}
+#a3d.a3-f .a3-hint{opacity:0}
+.a3-prog{position:absolute;left:0;right:0;bottom:0;height:2px;background:rgb(var(--cream-rgb) / .12)}
+.a3-prog i{display:block;height:100%;background:var(--gold);transform-origin:0 50%;transform:scaleX(0)}
+@media (max-width:900px){
+  .a3-scrim{background:linear-gradient(180deg,rgb(var(--shade2-rgb) / .78) 0,rgb(var(--shade2-rgb) / .2) 34%,rgb(var(--shade2-rgb) / 0) 50%)}
+  .a3-chs{top:calc(var(--hdr) + 20px);right:var(--m);width:auto}
+  .a3-ch h2{margin-top:14px;font-size:clamp(32px,9vw,44px)}
+  .a3-ch .pl{position:fixed;left:var(--m);right:var(--m);bottom:calc(30px + var(--sab));margin:0}
+  .a3-ch .pl li{padding:8px 0;font-size:14.5px}
+  .a3-ch .nt{display:none}
+  .a3-rail,.a3-hint{display:none}
+  .a3-c .ln{display:none}
+  /* 폰: 설명선 없이 점 바로 위 가운데에 번호 · 부위 이름을 작게(점이 화면 위쪽이면 아래에). 화면 밖으로 나가지 않게 a3d.js가 --sx로 좌우를 보정 */
+  .a3-c span,.a3-c.l span{left:0;right:auto;top:-30px;flex-direction:row;gap:6px;padding:3px 10px 3px 3px;font-size:12px;letter-spacing:-.01em;transform:translate(calc(-50% + var(--sx,0px)),-50%) translateY(6px)}
+  .a3-c.on span{transform:translate(calc(-50% + var(--sx,0px)),-50%)}
+  .a3-c.up span{top:-30px}.a3-c.dn span{top:30px}
+  .a3-c span i{width:22px;height:22px;font-size:10px}
+  .a3-hdg{bottom:calc(8px + var(--sab));width:70vw}.a3-hdg b{font-size:10.5px}.a3-hdg.a3-pt{opacity:0}
+}
+/* 3D를 쓸 수 없는 환경: 고정 없이 기종별 목록 */
+#a3d.a3-nogl{height:auto}
+#a3d.a3-nogl .a3-stage{position:relative;height:auto;padding-block:calc(var(--hdr) + 32px) 64px}
+#a3d.a3-nogl .a3-cv,#a3d.a3-nogl .a3-co,#a3d.a3-nogl .a3-rail,#a3d.a3-nogl .a3-hint,#a3d.a3-nogl .a3-prog,#a3d.a3-nogl .a3-scrim,#a3d.a3-nogl .a3-hdg{display:none}
+#a3d.a3-nogl .a3-chs{position:relative;left:auto;top:auto;width:auto;margin-inline:var(--m);display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:48px var(--gut)}
+#a3d.a3-nogl .a3-ch{position:relative;visibility:visible}
+#a3d.a3-nogl .a3-ch>*,#a3d.a3-nogl .a3-ch .pl li,#a3d.a3-nogl .a3-ch .nt{opacity:1;filter:none;transform:none}
+#a3d.a3-nogl .a3-ch .fb{display:block;width:100%;max-width:320px;margin-top:20px}
+#a3d.a3-nogl .a3-ch .pl{position:static;left:auto;right:auto;bottom:auto;margin-top:24px;pointer-events:none}
+#a3d.a3-nogl .a3-chs{right:auto}
+#a3d.a3-nogl .a3-ch .nt{display:block}

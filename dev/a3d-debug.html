@@ -1,0 +1,22 @@
+<!doctype html><html><head><meta charset="utf-8"><style>@font-face{font-family:"HanjinGroupSans";src:url("../web/fonts/HanjinGroupSans-Bold-base.woff2") format("woff2");font-weight:700}html,body{margin:0;height:100%;background:radial-gradient(120% 90% at 50% 38%,#34383b 0,#25282A 45%,#1a1c1e 100%)}canvas{display:block;width:100vw;height:100vh}</style></head><body>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.min.js"}}</script>
+<canvas id="c"></canvas>
+<script type="module">
+import * as THREE from 'three';
+import {createStage} from '../web/js/a3d-stage.js';
+import {build} from '../web/js/a3d-craft.js';
+const q=new URLSearchParams(location.search);
+const st=createStage(document.getElementById('c'),{dpr:1});st.resize(innerWidth,innerHeight);
+await document.fonts.load('700 200px "HanjinGroupSans"');
+const A=build(q.get('t')||'787');st.pivot.add(A.group);
+const box=new THREE.Box3().setFromObject(A.group);const sph=box.getBoundingSphere(new THREE.Sphere());const R=sph.radius;
+st.fit(R,box.min.y-R*.28);
+if(q.get('uv')){const cv=document.createElement('canvas');cv.width=512;cv.height=512;const g=cv.getContext('2d');const Y=th=>(1-th/(2*Math.PI))*512;
+  [['#f00',0,Math.PI/2],['#0f0',Math.PI/2,Math.PI],['#00f',Math.PI,1.5*Math.PI],['#ff0',1.5*Math.PI,2*Math.PI]].forEach(([c,a,b])=>{g.fillStyle=c;g.fillRect(0,Y(b),512,Y(a)-Y(b))});
+  g.fillStyle='#fff';g.fillRect(0,0,40,512);/* 기수 쪽 흰 띠 */
+  const t=new THREE.CanvasTexture(cv);t.colorSpace=THREE.SRGBColorSpace;A.all.forEach(m=>{if(m.material.map&&m.material.map.image&&m.material.map.image.width===4096){m.material=m.material.clone();m.material.map=t}})}
+A.group.rotation.y=+(q.get('ry')||0);
+if(q.get('hl')){const set=new Set(Object.values(A.parts).flat());A.all.forEach(m=>{if(set.has(m)){m.material=new THREE.MeshStandardMaterial({color:0xff2222,roughness:.4})}})}
+st.view({yaw:+(q.get('yaw')||.7),el:+(q.get('el')||.28),dist:+(q.get('d')||1),target:(q.get('tg')||'0,0,0').split(',').map(Number)},R);
+st.render();window.done=true;
+</script></body></html>

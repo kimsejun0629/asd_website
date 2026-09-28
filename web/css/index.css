@@ -1,0 +1,234 @@
+/* 메인(index · index-en) 전용 스타일 — 두 쪽이 같은 파일을 fonts.css · site.css 뒤에 불러옴(규칙 순서도 캐스케이드의 일부 — 옮기지 말 것)
+   영문 전용 규칙은 원래 자리에 :where(html[lang="en"]) 접두어(명시도 0) · index.html은 lang이 없어 국문
+   히어로 틀 높이 · 영상 맞춤은 이 파일, 사업 패널 미디어 펼침은 site.css 15, 문의 버튼 줄(.cta-act)은 site.css 16 · 색 · 칸 사이는 site.css 토큰 */
+/* 국문: 예전 게시 틀이 body에 준 14px(영문은 기본 16px) — 채용 안내 화살표(.cta-job .arw) 칸 높이가 이 값을 따름 */
+:where(html:not([lang="en"])) body{font-size:14px}
+
+/* ---------- 히어로 ---------- */
+/* 영상은 원본 2:1을 보존하고 낮은 창에서는 너비도 함께 줄임 */
+.hero{padding-top:var(--hdr)}
+.hv{position:relative;width:min(100%,calc((100svh - var(--hdr) - var(--sab) - 24px) * 2));aspect-ratio:2/1;margin-inline:auto;overflow:hidden;background:var(--night);container-type:inline-size}
+.hv video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block}
+.hv-shade{position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgb(var(--shade-rgb) / .85),rgb(var(--shade-rgb) / .44) 52%,rgb(var(--shade-rgb) / 0) 88%);transition:opacity .35s}
+.hv-copy{position:absolute;left:4.5%;right:4.5%;top:8%;color:var(--cream);transition:opacity .35s,visibility .35s}
+.hv-lbl{margin-bottom:clamp(16px,1.5cqw,24px);color:var(--cream);font-size:clamp(11px,.9cqw,13px);letter-spacing:.12em}
+.hv-h1{margin:0;font-size:clamp(40px,4cqw,64px);line-height:1.16;letter-spacing:-.025em;font-weight:300}
+.hv-h1 strong{display:block;font-weight:700}
+.hv-lead{margin:clamp(18px,1.8cqw,28px) 0 0;font-size:clamp(15px,1.2cqw,18px);line-height:1.6}
+.hv-ctas{display:flex;margin-top:clamp(24px,2.2cqw,34px)}
+.hv-ctas .btn{height:52px;min-width:170px;font-size:15px}
+.hero-intro{padding:32px var(--m) 40px}
+.hero-intro-text{max-width:960px;margin:0;font-size:16px;line-height:1.8;color:var(--cream80)}
+@media (min-width:901px){
+  .hv.is-ending .hv-copy,.hv.is-ending .scue{opacity:0;visibility:hidden;pointer-events:none}
+  .hv.is-ending .hv-shade{opacity:0}
+}
+
+/* ---------- 사업 ---------- */
+.biz{background:var(--cream);color:var(--night)}
+.bp{--k:0;position:relative;display:flex;flex-direction:column;overflow:hidden;scroll-margin-top:-24px}
+.bp-in>*{--k:initial}   /* 물러남 정도(--k)는 덮개(::after)와 안쪽 틀(.bp-in)만 씀 — 그 아래로 물려주지 않아 값이 바뀔 때 패널 안 모든 요소를 다시 계산하지 않음 */
+.bp-a{background:var(--cream);color:var(--night);--ln:var(--lineK);--sub:var(--ink80)}
+.bp-b{background:var(--night);color:var(--cream);--ln:var(--line2);--sub:var(--cream80)}
+.bp-c{background:var(--cream);color:var(--night);--ln:var(--lineK);--sub:var(--ink80)}
+.bp::after{content:"";position:absolute;inset:0;z-index:3;background:#101112;opacity:calc(var(--k) * .55);pointer-events:none}   /* 물러나는 패널 덮개 — #101112는 이 자리만 쓰는 검정 */
+.bp-in{position:relative;flex:1 1 auto;display:flex;flex-direction:column;transform-origin:50% 0;transform:scale(calc(1 - var(--k) * .045))}
+.bp-top{padding:clamp(28px,3.2vw,44px) var(--m) 0;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:var(--gut);align-items:start}
+.bp-meta{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:24px}   /* 영문 부제: 아래 구분선 없이 한글 제목 바로 위에 붙여 한 묶음으로 */
+.bp-en{color:var(--sub)}
+.bp-t{grid-column:1/span 6;margin-top:clamp(10px,.9vw,16px);font-size:clamp(56px,7.2vw,116px);line-height:.95;letter-spacing:-.055em}
+.bp-lead{grid-column:7/span 6;margin-top:clamp(32px,3.4vw,52px);font-size:clamp(18px,1.45vw,23px);line-height:1.6;letter-spacing:-.015em}
+.bp-pf{grid-column:1/span 9;margin:clamp(28px,3vw,44px) 0 0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));column-gap:var(--gut)}
+.bp-pf li{display:flex;flex-direction:column;gap:8px;padding-top:14px;box-shadow:inset 0 1px 0 var(--ln);font-size:15px;line-height:1.5}
+.bp-pf .y{font-size:var(--fs-lbl);font-weight:700;letter-spacing:var(--ls-lbl);color:var(--sub)}
+.bp-go{grid-column:10/span 3;justify-self:end;align-self:end}
+/* 무인기 기체 스트립 */
+.fleet{position:relative;display:flex;height:clamp(280px,30vw,420px);margin-top:clamp(28px,3vw,44px);overflow:hidden;box-shadow:inset 0 1px 0 var(--line2),inset 0 -1px 0 var(--line);background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:56px 56px}
+.fleet:not(.run){overflow-x:auto}
+.fl-track{display:flex;flex:none}
+.fleet.run .fl-track{animation:fleet 80s linear infinite}
+.fleet.run:hover .fl-track,.fleet.run:focus-within .fl-track{animation-play-state:paused}
+@keyframes fleet{to{transform:translateX(-50%)}}
+.fl{flex:none;width:clamp(240px,22vw,340px);display:flex;flex-direction:column;gap:14px;padding:22px 24px 20px;box-shadow:inset -1px 0 0 var(--line)}
+.fl .im{position:relative;flex:1 1 auto;min-height:0}
+.fl .im img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;transition:transform .9s var(--ease-img)}
+.fl:hover .im img,.fl:focus-visible .im img{transform:translateY(-6px) scale(1.04)}
+.fl .nm{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding-top:12px;box-shadow:inset 0 1px 0 var(--line2)}
+.fl .nm b{font-size:16px;font-weight:700;letter-spacing:-.01em;white-space:nowrap}
+.fl .nm span{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--cream80);white-space:nowrap}
+.fl .tg{position:absolute;left:0;top:0;padding:3px 8px;font-size:11px;font-weight:700;color:var(--cream80);box-shadow:inset 0 0 0 1px var(--line2)}
+/* 항공기체 제작 부품 스트립: 무인기 스트립과 같은 흐름, 밝은 패널 색 */
+.fleet.pk{--line:rgb(var(--night-rgb) / .09);--line2:rgb(var(--night-rgb) / .24);--cream80:var(--ink80);box-shadow:inset 0 1px 0 var(--lineK),inset 0 -1px 0 rgb(var(--night-rgb) / .14)}
+.pk .fl{gap:12px;box-shadow:inset -1px 0 0 rgb(var(--night-rgb) / .13)}
+.pc-o{font-size:11px;font-weight:700;letter-spacing:.1em;line-height:1.2;text-transform:uppercase;color:var(--ink80);white-space:nowrap}
+.pk .im{container-type:size}
+.pc-d{position:absolute;left:50%;top:50%;width:100%;height:100%;transform:translate(-50%,-50%);transition:transform .9s var(--ease-img)}
+@supports (width:1cqw){.pc-d{width:min(100cqw,100cqh * var(--r));height:auto;aspect-ratio:var(--r)}}
+.pk .fl:hover .pc-d{transform:translate(-50%,calc(-50% - 6px)) scale(1.04)}
+.pc-d svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.pc-d svg *{vector-effect:non-scaling-stroke}
+.xa{fill:rgb(var(--paper-rgb) / .34);stroke:rgb(var(--night-rgb) / .5);stroke-width:1;stroke-linejoin:round}
+.xd{fill:none;stroke:rgb(var(--night-rgb) / .55);stroke-width:1}
+.xo{fill:rgb(var(--paper-rgb) / .5);stroke:rgb(var(--night-rgb) / .5);stroke-width:1}
+.xk{fill:var(--night);stroke:var(--night);stroke-width:.5;transition:fill .5s var(--ease-std),stroke .5s var(--ease-std)}
+.xh{stroke-dasharray:2 2}
+.pk .fl:hover .xk{fill:var(--gold);stroke:var(--gold)}
+.pc-n,.pc-p i{display:block;width:15px;height:15px;border-radius:50%;background:var(--night);color:var(--cream);font-size:9.5px;font-weight:700;font-style:normal;line-height:15px;text-align:center;font-variant-numeric:tabular-nums}
+.pc-n{position:absolute;transform:translate(-50%,-50%)}
+.pc-p{display:flex;flex-wrap:wrap;align-content:flex-start;gap:3px 12px;min-height:calc(3 * 1.45em + 6px);font-size:13px;line-height:1.45;color:var(--ink80)}
+.pc-p>span{display:inline-flex;align-items:center;gap:6px}
+.pc-p i{flex:none;width:14px;height:14px;line-height:14px;font-size:9px}
+.pc-h{position:absolute;inset:0;margin:0;padding:0;list-style:none;display:flex;flex-direction:column;justify-content:center}
+.pc-h li{display:grid;grid-template-columns:40px minmax(0,1fr);column-gap:10px;padding:8px 0;font-size:13.5px;line-height:1.4;box-shadow:inset 0 -1px 0 rgb(var(--night-rgb) / .14)}
+.pc-h b{font-weight:700;color:var(--ink80);font-variant-numeric:tabular-nums}
+/* 세로가 낮은 창: 부품 이름 줄을 접고 도면을 키움, 생산 이력은 촘촘하게 */
+@container pk (max-height:330px){.pc-p{display:none}}
+@container (max-height:240px){.pc-h li{padding:2px 0;font-size:12px;line-height:1.35;box-shadow:none}}
+/* 영문: 901~1080px에서 이력 · 버튼을 한 줄 전체로 */
+@media (min-width:901px) and (max-width:1080px){:where(html[lang="en"]) .bp-pf{grid-column:1/-1}:where(html[lang="en"]) .bp-go{grid-column:1/-1;margin-top:24px}}
+@media (min-width:901px) and (min-height:680px){
+  .bp{position:sticky;top:var(--hdr);height:calc(100svh - var(--hdr) - var(--sab))}
+  .bp-b,.bp-c{box-shadow:0 -28px 56px var(--drop)}
+  /* 세로로 긴 화면(태블릿 세로, 큰 모니터)에서도 패널 아래가 비지 않게 기체 스트립이 남은 높이를 채움 */
+  .fleet{flex:1 1 auto;height:auto;min-height:200px}
+  .fleet{container-type:size}
+  .fl{width:clamp(240px,max(22vw,60cqh),480px)}
+  .fleet.pk{container-name:pk}
+}
+
+/* ---------- 미래 기술 ---------- */
+.fut{grid-column:1/-1;margin-top:88px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));column-gap:var(--gut)}
+.fc{display:flex;flex-direction:column;gap:18px}
+.fc .fr{aspect-ratio:16/10;overflow:hidden;background:var(--cblue)}
+.fc .fr img{display:block;width:100%;height:100%;object-fit:cover;transition:transform var(--t-img)}
+.fc:hover .fr img{transform:scale(1.035)}
+.fc .lbl{color:var(--cream80);margin-top:6px}
+.fc h3{font-size:clamp(24px,2.1vw,32px);line-height:1.2;letter-spacing:-.03em}
+.fc p{font-size:16px;line-height:1.7;color:var(--cream80)}
+.fc ul{margin:6px 0 0;padding:0;list-style:none;display:flex;flex-direction:column}
+.fc li a{display:grid;grid-template-columns:64px minmax(0,1fr) auto;column-gap:12px;align-items:baseline;padding:13px 0;box-shadow:inset 0 1px 0 var(--line2);font-size:14.5px;line-height:1.5}
+.fc li:last-child a{box-shadow:inset 0 1px 0 var(--line2),inset 0 -1px 0 var(--line2)}
+.fc li .d{font-size:12px;font-weight:700;letter-spacing:.04em;color:var(--cream80)}
+.fc li svg{color:var(--cream80);transition:transform var(--t-roll)}
+.fc li a:hover svg{transform:translate(2px,-2px)}
+
+/* ---------- 뉴스 ---------- */
+.news-h{display:flex;align-items:flex-end;justify-content:space-between;gap:24px}
+.more{display:inline-flex;align-items:center;gap:12px;flex-shrink:0;font-size:15px;font-weight:700}
+.more:hover .arw{transform:translateX(6px)}
+.nws{grid-column:1/-1;margin-top:72px;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:var(--gut);row-gap:48px;align-items:start}
+.nc{grid-column:span 3;gap:16px}
+.nc:first-child{grid-column:span 6}
+.nc .fr{aspect-ratio:16/10}
+.nc .meta{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:13px;color:var(--ink80)}
+.nc .t{font-size:18px;line-height:1.5;letter-spacing:-.01em}
+.nc:first-child .t{font-size:clamp(22px,2vw,30px);line-height:1.4;letter-spacing:-.02em}
+.nc .t svg{margin-left:6px;color:var(--ink80);vertical-align:1px}
+
+/* ---------- 문의 ---------- */
+.cta-t{font-size:clamp(40px,5.6vw,88px);line-height:1.05;letter-spacing:-.05em}
+.cta .body{margin-top:32px;max-width:560px}
+.cta-job{margin-top:96px;display:flex;align-items:center;justify-content:space-between;gap:24px;padding:28px 0;box-shadow:inset 0 1px 0 var(--line2),inset 0 -1px 0 var(--line2)}
+.cta-job .tx{display:flex;flex-direction:column;gap:12px}
+.cta-job .lbl{color:var(--cream80)}
+.cta-job .h{font-size:clamp(22px,2.2vw,32px);letter-spacing:-.025em}
+.cta-job .nw{white-space:nowrap}
+.cta-job .arw svg{width:28px;height:28px}
+.cta-job:hover .arw{transform:translateX(8px)}
+
+@media (max-width:900px){
+  /* 폰: 영상 전체를 먼저 보여주고 문구는 아래에 둠 */
+  .hv{width:100%;aspect-ratio:auto;overflow:visible;padding-bottom:44px}
+  .hv video{position:relative;inset:auto;height:auto;aspect-ratio:2/1;max-height:calc(100svh - var(--hdr) - var(--sab) - 24px)}
+  .hv-shade{display:none}
+  .hv-copy{position:static;padding:28px var(--m) 8px}
+  .hv-lbl{margin-bottom:20px;font-size:12px}
+  .hv-h1{font-size:clamp(32px,8.2vw,36px);line-height:1.22}
+  .hv-lead{margin-top:20px;font-size:15.5px;line-height:1.75;color:var(--cream80)}
+  .hv-ctas{margin-top:24px}
+  .hv-ctas .btn{min-width:170px;height:48px}
+  .hero-intro{padding:24px var(--m) 32px}
+  .hero-intro-text{font-size:15.5px;line-height:1.75}
+  .bp-top{grid-template-columns:minmax(0,1fr)}
+  .bp-meta{gap:12px}
+  .bp-en{display:block}   /* 사업 패널 상단 탭 삭제 뒤: 윗줄에는 분야 부제만 남기고, 모바일에서도 보이게 */
+  .bp-t,.bp-lead,.bp-pf,.bp-go{grid-column:1/-1}
+  .bp-t{font-size:clamp(44px,12vw,64px)}
+  .bp-lead{margin-top:20px;font-size:17px}
+  .bp-pf{grid-template-columns:minmax(0,1fr);row-gap:14px}
+  .bp-go{justify-self:stretch;margin-top:28px}
+  .bp-go .btn{width:100%}
+  .fleet{height:300px}
+  .fl{width:210px;padding:16px}
+  .fleet.pk{height:380px}
+  .pk .fl{width:220px}
+  .pk .fl.pc-hs{width:250px}
+  .pc-p{min-height:calc(4 * 1.45em + 9px);gap:3px 10px;font-size:12px}
+  .pc-n{width:13px;height:13px;line-height:13px;font-size:8.5px}
+  .pc-h li{grid-template-columns:36px minmax(0,1fr);padding:6px 0;font-size:12.5px}
+  .fut{grid-auto-flow:column;grid-template-columns:none;grid-auto-columns:84%;column-gap:16px;margin:56px calc(var(--m) * -1) 0;padding:0 var(--m) 8px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-inline:var(--m)}
+  .fc{scroll-snap-align:start}
+  .news-h{flex-direction:column;align-items:flex-start}
+  .nws{margin-top:48px;row-gap:40px}
+  .nc,.nc:first-child{grid-column:1/-1}
+  .cta-job{margin-top:64px}
+}
+@media (prefers-reduced-motion:reduce){.hv-copy,.hv-shade{transition:none}.fleet .fl-track{animation:none!important}.bp-in{transform:none!important}}
+
+/* ---------- 영문 조판(영문 쪽만) ---------- */
+:where(html[lang="en"]) .hv-h1{letter-spacing:-.03em}
+:where(html[lang="en"]) .bp-t{font-size:clamp(44px,5.4vw,88px);line-height:.98;letter-spacing:var(--ls-h1)}
+:where(html[lang="en"]) .bp-lead{letter-spacing:-.01em}
+:where(html[lang="en"]) .bp-pf li{font-size:14.5px}
+:where(html[lang="en"]) .bp-pf .y{letter-spacing:.1em;text-transform:uppercase}
+:where(html[lang="en"]) .fl .nm b{font-size:15px}
+:where(html[lang="en"]) .fc h3{letter-spacing:-.02em}
+:where(html[lang="en"]) .cta-t{font-size:clamp(38px,5vw,80px);letter-spacing:var(--ls-h1)}
+:where(html[lang="en"]) .kr-note{grid-column:1/-1;margin-top:28px;font-size:13px;color:var(--cream80)}
+:where(html[lang="en"]) .fl .nm{flex-direction:column;align-items:flex-start;gap:6px}
+@media (max-width:900px){:where(html[lang="en"]) .hv-h1{font-size:clamp(32px,7.4vw,36px);letter-spacing:-.025em}:where(html[lang="en"]) .bp-t{font-size:clamp(40px,11vw,56px)}}
+/* MRO/U 패널: 창정비 · 성능개량 플랫폼 사진을 모두 모은 두 줄 사진 벽(한화에어로스페이스 메인 'Our partners' 구성 참조).
+   윗줄은 왼쪽, 아랫줄은 오른쪽으로 흐름 — 항공기체 · 무인기 스트립처럼 스스로 흐르고, 스크롤하면 빨라지고, 한 바퀴 돌면 아래로(영상은 사업-MRO/U 페이지에만) */
+.fleet.wall{--wg:clamp(8px,.75vw,14px);flex-direction:column;gap:var(--wg);padding-block:var(--wg);background-image:none}
+.wall .wr{position:relative;flex:1 1 0;min-height:0;display:flex;overflow:hidden}
+.wall .fl-track{height:100%}
+.wt{position:relative;flex:none;height:100%;aspect-ratio:4/3;margin-right:var(--wg);overflow:hidden;background:var(--cblue);color:var(--cream);container-type:inline-size}
+.wt img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .9s var(--ease-img)}
+.wt img.ot{scale:1.5;transform-origin:50% 5%}
+.wt:hover img,.wt:focus-visible img{transform:scale(1.05)}
+.wc{position:absolute;left:0;right:0;bottom:0;display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding:34px 12px 10px;background:linear-gradient(0deg,rgb(var(--shade2-rgb) / .92) 0,rgb(var(--shade2-rgb) / .8) 50%,rgb(var(--shade2-rgb) / 0) 100%);text-shadow:0 0 12px rgb(var(--shade-rgb) / .6),0 1px 2px rgb(var(--shade-rgb) / .4)}
+.wc b{font-size:clamp(12.5px,4.4cqw,17px);font-weight:700;letter-spacing:-.01em;white-space:nowrap}
+.wc span{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--cream);white-space:nowrap}
+.wc span::before{content:"";width:6px;height:6px;border-radius:50%;box-shadow:inset 0 0 0 1px var(--cream80)}
+.wt.up .wc span::before{background:var(--gold);box-shadow:0 0 0 1px var(--cream)}
+.ws{display:flex;flex-direction:column;justify-content:space-between;padding:clamp(10px,7cqh,20px) clamp(12px,6cqw,20px);background:var(--cream);color:var(--night);container-type:size}
+.wn{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 6px}
+.wn b{font-weight:300;font-size:clamp(26px,34cqh,84px);line-height:.95;letter-spacing:var(--ls-num)}
+.wn span{font-size:clamp(11px,8cqh,15px);font-weight:700;white-space:nowrap}
+.wd{display:flex;flex-direction:column;font-size:clamp(10.5px,8cqh,14px);line-height:1.4;color:var(--ink80)}
+@container (max-height:150px){.wd span+span{display:none}}
+/* 좁은 칸(세로가 낮은 화면): 기종 이름과 구분을 두 줄로 */
+@container (max-width:220px){.wc{flex-direction:column;align-items:flex-start;gap:3px;padding:32px 10px 8px}.wc b{font-size:12.5px}.wc span{font-size:10.5px;letter-spacing:.04em}}
+/* 등장: 두 줄이 서로 반대쪽에서 밀려 들어옴 */
+html.rv .wall[data-rv="fl"]:not(.rv-end) .wr{transition:opacity 1s var(--rv-ease) calc(var(--d,0s) + var(--i,0) * .16s),filter 1s var(--rv-ease) calc(var(--d,0s) + var(--i,0) * .16s),transform 1.2s var(--rv-ease) calc(var(--d,0s) + var(--i,0) * .16s)}
+html.rv .wall[data-rv="fl"]:not(.in) .wr{opacity:0;filter:blur(8px);transform:translateX(calc(var(--s,1) * 48px))}
+.wall .wr+.wr{--i:1;--s:-1}
+.wall:not(.run) .wr{overflow-x:auto}
+/* 항공기체 · 무인기 스트립: 스스로 흐르다가, 스크롤하면 그만큼 빨라짐.
+   PC(패널 고정 화면)에서는 스트립이 한 바퀴 다 돌 때까지 그 패널이 머물고, 다 돌면 다음 패널이 올라옴 */
+.fleet.drive .fl-track{animation:none!important;will-change:transform}
+.pk-pin{display:none}
+/* 항공기체 스트립: 같은 구도의 도면 위 기체를 실사풍 탑뷰(대한항공 도장)로 — 부품 강조 · 번호 · 확대 원은 그대로 위에 */
+.pc-d.rp image{pointer-events:none}
+.pc-d.rp .xk{fill-opacity:.88;stroke:rgb(var(--paper-rgb) / .55);stroke-width:1}
+.pc-d.rp.ah .xk{fill-opacity:.32;stroke:var(--night);stroke-width:1.2}
+.pk .fl:hover .pc-d.rp.ah .xk{fill-opacity:.55}
+.pk-prog{position:absolute;left:0;bottom:0;z-index:2;width:100%;height:2px;background:var(--gold);transform-origin:0 50%;transform:scaleX(0);pointer-events:none;display:none}
+@media (min-width:901px) and (min-height:680px){.pk-pin{display:block;height:var(--pin,0px)}.pk-prog{display:block}}
+/* 최근 소식 머리글: 링크는 오른쪽 끝 */
+.news-h .more{margin-left:auto}
+@media (max-width:900px){.news-h .more{margin-left:0}}
+/* MRO/U 패널을 밝은 패널로(항공기체 밝음 · 무인기 어두움 · MRO/U 밝음이 번갈아): 사진 벽 선 · 통계 칸 · 버튼 색 */
+.bp-c .fleet.wall{--line:rgb(var(--night-rgb) / .09);--line2:rgb(var(--night-rgb) / .24);box-shadow:inset 0 1px 0 var(--lineK),inset 0 -1px 0 rgb(var(--night-rgb) / .14)}
+.bp-c .ws{background:var(--night);color:var(--cream)}
+.bp-c .wd{color:var(--cream80)}

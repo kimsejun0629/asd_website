@@ -1,0 +1,5 @@
+[0:v]crop=1920:384:0:348,split=3[a][b][c];
+[a]trim=0:116.8333,setpts=PTS-STARTPTS,crop=1536:384:'if(lt(t,57.7),115,if(lt(t,62.7),230,if(lt(t,68.8),288,if(lt(t,74.5),230,if(lt(t,78.3),269,if(lt(t,93.7),115,if(lt(t,97.73),192,if(lt(t,104.43),115,192))))))))':0,scale=W:H:flags=lanczos[a1];
+[b]trim=116.8333:125.45,setpts=PTS-STARTPTS,crop=1336:334:292:25,scale=W:H:flags=lanczos[b1];
+[c]trim=start=125.45,setpts=PTS-STARTPTS,crop=1536:384:192:0,scale=W:H:flags=lanczos[c1];
+[a1][b1][c1]concat=n=3:v=1:a=0,format=yuv420p[v]
