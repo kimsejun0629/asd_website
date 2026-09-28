@@ -1,1 +1,16 @@
+
+# 기록 · 검증 결과 · 도구 출력 · 원본 자료
+_archive/
+_verification/
+_out/
+research/
 assets/
+
+# 현행이 아닌 도구
+tools/pylib/
+tools/_legacy/
+
+# Premiere 프로젝트 · macOS
+Adobe Premiere Pro*/
+*.prproj
+.DS_Store
