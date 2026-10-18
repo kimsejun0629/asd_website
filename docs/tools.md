@@ -28,13 +28,14 @@
 | `tools/fonts/mkfonts.py` | 한진그룹체를 겹치지 않는 unicode-range 3조각 + `web/css/fonts.css`로(publish.md §4). `--check`. `import`로 `syl()` · `used()`만 쓰면 fontTools가 필요 없다 |
 | `tools/data/fmtjson.py` | `web/data/*.json`을 레코드 한 줄씩으로(값 · 순서 그대로). `--check` |
 | `tools/pattern/build.py` | 브랜드 2D 패턴(§4) |
+| `tools/swarm/build.py` | 메인 군집 드론 형상 점 구름 → `web/data/swarm.bin`(swarm.md). `--preview 폴더` |
 | `tools/pattern/shot.py` | 패턴 요소만 흰색으로 드러내 캡처(탭은 `careers.html#process`처럼). **`OLD=1`은 깨져 있다**: 마스크를 `/web/img/pattern.webp`에서 읽는데 그 파일은 `_archive/replaced-20260926/`로 갔다 |
-| `tools/render/` | 메인 스트립용 위에서 본 기체: `masks.py`(svgs.json → `m_*.png`) → `shade2.py <기종…>` → `top_<기종>.webp`. **`tools/render`에서 실행**(cwd의 `svgs.json` · `m_*.png` · `meta.json` · `HanjinGroupSans-Bold.ttf`를 읽음). 인자 없이 돌리면 제외된 g6500까지 만드니 기종을 지정한다. 결과는 **새 이름으로 복사**해 `web/img/aero/top-<기종>-k26.webp`(AH-6만 `top-ah6.webp`) — 메인 `#aero` 스트립과 aero 3D 대체 목록이 같은 파일을 쓴다 |
+| `tools/render/` | 위에서 본 기체: `masks.py`(svgs.json → `m_*.png`) → `shade2.py <기종…>` → `top_<기종>.webp`. **`tools/render`에서 실행**(cwd의 `svgs.json` · `m_*.png` · `meta.json` · `HanjinGroupSans-Bold.ttf`를 읽음). 인자 없이 돌리면 제외된 g6500까지 만드니 기종을 지정한다. 결과는 **새 이름으로 복사**해 `web/img/aero/top-<기종>-k26.webp`(AH-6만 `top-ah6.webp`) — aero 3D 대체 목록이 쓴다(`top_g6500`은 swarm 원본) |
 | `tools/hv/` | 영상 인코딩: `enc.sh` · `encF.sh`(2-pass x264) · `track.py`(기체 중심 키프레임 → `fcF*.txt`, encF.sh가 읽음) · `cuts.txt` · `fc*.txt`(입력). 두 .sh의 `FF`와 `S`(`cd` 할 작업 폴더)는 옛 세션 scratchpad 경로다 → `FF=tools/pylib/imageio_ffmpeg/binaries/ffmpeg-macos-aarch64-v7.1`, `S`는 출력 폴더(`_out/hv` 등)로 바꿔 쓴다 |
 | `tools/pylib/` | imageio-ffmpeg(ffmpeg 바이너리) |
 | `tools/serve/Caddyfile` | 외부 미리보기 서버(verify.md §1) |
 
-- 메인 히어로 `web/video/hero2-800/1600.mp4`: 원본이 H.264 Level 6.2 · 시간 단위 1/1,000,000으로 잘못 표기돼 있어, 재인코딩 없이 Level 4.0 · 30 fps로 고친 파일이다(프레임 동일). 재생은 motion.md §6.
+- 옛 메인 히어로 `web/video/hero2-800/1600.mp4`(2026-10-18부터 안 씀): Level 6.2 오표기를 재인코딩 없이 4.0 · 30 fps로 고친 파일.
 
 ## 3. 옛 도구 `tools/_legacy/` (기록용 — 다시 돌리지 않음)
 

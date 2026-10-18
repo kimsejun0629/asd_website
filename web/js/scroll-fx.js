@@ -74,13 +74,14 @@ $$('.biz .bp').forEach(bp=>{
   /* 고정 패널은 아래에서 덮어 올라오므로, 패널이 화면 절반 넘게 올라온 뒤에 재생해야 글이 나타나는 과정이 보임 */
   const g=SEQ[SEQ.length-1];if(g&&g.trigger===bp)g.line=.42;
 });
-const fut=hero&&$('#future');
+const home=hero||$('#swarm');   /* 메인: 예전 영상 히어로 또는 군집 드론 무대 */
+const fut=home&&$('#future');
 if(fut){
   seq(fut,[['.side>*','t',0,.12],['.main .lead','t',.3]]);
   $$('.fut>.fc',fut).forEach((fc,k)=>{const b=.25+k*.18;seq(fc,[['.fr','img',b],['.lbl','t',b+.3],['h3','t',b+.42],['p','t',b+.54],['li','t',b+.68,.1]])});
   const krn=$('.kr-note',fut);if(krn)seq(krn,[[krn,'t',0]]);   /* 영문 페이지: 한국어 기사 안내 */
 }
-const news=hero&&$('#news');
+const news=home&&$('#news');
 if(news){
   seq(news,[['.side>*','t',0,.12],['.news-h .more','t',.3]]);
   const nws=$('#nws',news);
@@ -91,7 +92,7 @@ if(news){
     new MutationObserver(()=>{tag();watch()}).observe(nws,{childList:true});
   }
 }
-const ct=hero&&$('#contact');
+const ct=home&&$('#contact');
 if(ct)seq(ct,[['.side>*','t',0,.12],['.main>.body','t',.36],['.cta-act .btn','t',.56,.1],['.cta-job','t',.85]]);
 
 /* ── 하위 페이지(회사소개 · 사업 · 뉴스룸 · 인재채용): 구역 구조에서 같은 순서를 자동으로 ──

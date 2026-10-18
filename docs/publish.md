@@ -57,6 +57,7 @@
   - `js/a3d-craft.js` ↔ `js/a3d-paint.js`
   - `mro*.html`(빈 `<path class="land">`) ↔ `js/mro.js`(fetch로 채움) ↔ `img/mro-land.svg` · `css/mro.css`
   - 각 쪽 HTML ↔ 그 쪽 `css/<쪽>.css` · `js/<쪽>.js`
+- **2026-10-18 메인 군집 드론(swarm.md):** 새 `js/swarm-gl.js` · `js/swarm.js` · `data/swarm.bin`, 바뀐 `index*.html` · `css/index.css` · `js/index.js` · `js/scroll-fx.js`(메인 판정). 리팩터 묶음과 함께 올린다. 옛 메인 영상 `video/hero2-*`는 안 씀.
 - 목록 다시 뽑기(v60 기준, 루트):
 
 ```sh

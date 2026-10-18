@@ -31,7 +31,7 @@
 ## 3. 쪽마다 불러오는 순서
 | 쪽 | 순서 |
 |---|---|
-| index | site → scroll-fx → index |
+| index | site → scroll-fx → index → swarm-gl → swarm |
 | aero | importmap → a3d.js(module, 파싱 뒤) → 인라인 대체 타이머 → site → scroll-fx |
 | uav | site → uav-data → uav-kit → uav-scenes1 → uav-scenes2 → uav → scroll-fx |
 | mro | site → scroll-fx → mro |
@@ -42,7 +42,7 @@
 순서가 중요한 까닭:
 - site.js가 `.subnext` · `.ph.bare` · `hidden`을 먼저 만든다.
 - careers는 `#jobList`, uav는 `.cht` 등을 **동기로** 채운다. 그래야 scroll-fx의 첫 `tagAll()` · `#seq` 태그가 이를 본다.
-- index.js는 scroll-fx 뒤다. 메인 순서는 scroll-fx가 먼저 등록하고, 복제 · `#nws`는 그 MutationObserver를 거친다.
+- index.js는 scroll-fx 뒤다. 메인 순서는 scroll-fx가 먼저 등록하고, `#nws`는 그 MutationObserver를 거친다. 군집 드론(swarm-gl → swarm)은 맨 끝(swarm.md).
 - history는 scroll · resize 리스너 순서 때문에 scroll-fx 앞이다.
 
 ## 4. 쉬는 동안 멈추는 루프(`KA.loop`)
@@ -50,20 +50,20 @@
 
 | 루프 | 깨우는 곳 | 멈춤 |
 |---|---|---|
-| index 스트립 | scroll · resize · load(measure 뒤) · 스트립 포인터 · IO 50% · RO(패널 · 여백 · 스트립) | 흐를 스트립(화면 근처 · 포인터 없음)도 스크롤 변화도 없음. 다시 켜면 `fresh`(첫 dt=직전 간격) |
+| 메인 `#swarm` | scroll · resize · IO · visibilitychange · 마우스 · RO | 무대 밖 · 탭 숨김(움직임 줄임이면 진행이 멈출 때도) |
 | scroll-fx `#seq` 글 | scroll · resize | 무대가 화면 밖이고 `.rv-in` 없음 |
 | history | scroll · 다시 배치(데이터 · resize · fonts.ready · load · 탭 열림) | 탭 숨김 · 데이터 없음 · p=q이고 드래그 없음 |
 | uav 장면 | scroll · resize · `KA_LENIS.on('scroll')`(첫 wheel에 연결) | 무대 밖 · 따라가기 끝. 멈출 때 `lastT=0` |
 
 따로 도는 것:
 - Lenis raf(scroll-fx): 움직이는 동안만(처음 켤 때만 프레임 간격을 재려고 16프레임 더). `scrollTo`가 다시 켜고 `ka-lenis`를 보낸다. 3D가 그 뒤로 줄을 선다.
-- a3d: 무대가 화면에 걸칠 때만. 한 번씩 도는 rAF: scroll-fx `update`, index `recede`.
+- a3d: 무대가 화면에 걸칠 때만. 한 번씩 도는 rAF: scroll-fx `update`.
 - 새 루프도 `KA.loop` + 깨우는 경로를 갖추고, 스크롤 없이 레이아웃이 바뀌면 그 루프도 깨운다.
 
 ## 5. 순차 등장(scroll-fx.js)
 - `html.rv`(+불러오는 동안 `rv-now`), 요소마다 `data-rv`와 `--d`(지연)를 둔다. 종류: `t` 글 · `img` 틀→사진 · `rule` 윗선→글 · `fl` 스트립 · `fade`.
-- 기준 요소 윗단이 `innerHeight*.78`을 넘으면 `.in`을 붙이고, 마지막 항목 +1.9초에 `.rv-end`를 붙인다. 메인 사업 패널은 PC 고정 화면(`MQ.stack`)에서 `.42`다. 페이지 끝에 닿으면 남은 블록도 재생한다.
-- 메인은 구역별 순서(hero → `.biz .bp` → `#future` → `#news`(`#nws` 다시 태그) → `#contact`)이고, 히어로 뒤 `genAt=+1.6s`다.
+- 기준 요소 윗단이 `innerHeight*.78`을 넘으면 `.in`을 붙이고, 마지막 항목 +1.9초에 `.rv-end`를 붙인다. 페이지 끝에 닿으면 남은 블록도 재생한다.
+- 메인은 구역별 순서(`#future` → `#news`(`#nws` 다시 태그) → `#contact`)이고, `#swarm`이 있으면 메인으로 본다(그 글은 swarm.js가 직접 다룸).
 - 하위 쪽은 `main>section.sec`를 `blocks()`로 자동 태그한다.
   - 목록 `COLL`의 카드는 하나씩, `.gside`는 라벨 → 제목 → 부제(`step .26`)다.
   - 이미 본 카드는 `data-rvq`, 묶은 틀은 `data-rvc`, 건너뛸 것은 `SKIP`(`.hx`, `#seq` …)이다.
@@ -72,14 +72,13 @@
 - `#seq`: `.cht` · `.spec` · `#phases>div` · `#ispecs>.ispec`에 `.rvs`와 자식 `--dl`을 둔다. uav가 쓴 불투명도(>.35)를 보고 `.rv-in`을 붙인다. 규칙은 css/uav.css 끝에 있다.
 
 ## 6. 영상
-- 메인(index.js): `hero2-800/1600`(MQ.narrow), 실패 시 800, 넓히면 1600으로 이어 재생. 자동 재생 거절 시 `INPUT`으로 재시도(`playing`까지).
-- 메인은 2:1 contain·확대 없음. 125.5초부터 `.is-ending`으로 PC 글·가림막·안내를 숨기고 반복 시 복원. 모바일 글은 유지. 시간 이벤트만 사용.
+- 메인에는 영상이 없다(2026-10-18 군집 드론 무대로 바뀜. 옛 히어로 영상 `video/hero2-*`는 쓰지 않음).
 - site.js의 `video[data-v]`: 400px 앞에서 불러온다.
 - 화면 밖 영상은 멈춘다(`root:document`, 100% 여백, 소리 없는 것만 `_auto`). 거절되면 `arm()`으로 입력을 기다리고, 소리 버튼은 `data-sound`, 비율은 `data-ar` → `.ph.w`(3:1 이상).
 
-## 7. 메인 `#business` · 스크롤 안내
-- `#business`(PC) = 고정 패널 `#aero` · `#uav` · `#mro` + 각 `.pk-pin` 여백. 스트립이 저절로 흐르다 스크롤하면 빨라지고, 여백에서 한 바퀴 더 돌면 다음 패널이 덮는다(index.js). `#mro`는 두 줄 사진 벽(윗줄 ←, 아랫줄 →).
-- `.scue`(site.js): 메인 · 하위 쪽 히어로 맨 아래 가운데. 누르면 다음 구역, 40px 넘게 내리면 사라지고 빛 줄기도 멈춤(`.idle`). PC 히어로 설명은 안내에 닿지 않는 폭(site.css).
+## 7. 메인 `#swarm` · 스크롤 안내
+- 메인 첫 구역 = 군집 드론 무대(swarm.md). 메뉴 '사업'(`#business`)은 그 첫 장(흉상)으로 간다.
+- `.scue`(site.js): 하위 쪽 히어로 맨 아래 가운데. 메인은 swarm.js가 같은 모양을 목차 위에 두고 누르면 무인기 장으로. 누르면 다음 구역, 40px 넘게 내리면 사라지고 빛 줄기도 멈춤(`.idle`). PC 히어로 설명은 안내에 닿지 않는 폭(site.css).
 - 무인기 `#seq`(엔진 · 장 더하기)는 uav.md.
 
 ## 8. 연혁(history.js)

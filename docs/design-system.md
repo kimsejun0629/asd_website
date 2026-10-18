@@ -8,7 +8,7 @@
 
 | 쪽 | 쪽 CSS |
 |---|---|
-| index · index-en | `index.css`(국문 body 14px · 히어로 2:1/화면 높이 제한 · `.hv-copy` · `.hero-intro`) |
+| index · index-en | `index.css`(국문 body 14px · 군집 드론 무대 `#swarm`(swarm.md) · 미래 기술 · 소식 · 문의) |
 | aero | `aero.css`(3D #a3d) |
 | uav | `uav.css`(#seq 무대, 맨 끝에 #seq 등장 규칙) |
 | mro | `mro.css` |
@@ -40,7 +40,7 @@
 | `--t-ui` `--t-line` `--t-roll` `--t-img` `--t-rv` | .3s std · .5s line · .45s roll · 1s img · 1.1s rv | 5번 이상 쓰인 길이+곡선 |
 
 **구역 색 토큰**은 `.sec`와 `.sec.light`에만 정의된다: `--fg`(글) · `--sub`(보조 글) · `--ln`(윗선) · `--ln0`(옅은 선) · `--acc`(강조) · `--pan`(옅은 판).
-두 면에서 값만 바뀌는 색은 `.light X{…}` 대신 이것을 쓴다. `.sec` 밖(머리글 · 메뉴 · 메인 `.biz`)에는 없다. 메인 `.bp-a/b/c`는 `--ln` · `--sub`를 스스로 정한다.
+두 면에서 값만 바뀌는 색은 `.light X{…}` 대신 이것을 쓴다. `.sec` 밖(머리글 · 메뉴 · 메인 `#swarm`)에는 없다.
 
 JS · 인라인 참조 속성(이름 보존): `--k` `--pin` `--open` `--d` `--dl` `--rv-line` `--rv-lo` `--i` `--n` `--sx` `--plx` `--gk` `--cw` `--ih` `--iw` `--ly` `--r` `--len`.
 
@@ -69,7 +69,7 @@ JS · 인라인 참조 속성(이름 보존): `--k` `--pin` `--open` `--d` `--dl
 
 ## 5. 구역 배경 교차 · 2D 패턴
 
-- 히어로 뒤 구역은 밝음(`.sec.light`) · 어두움을 번갈아 둔다(메인: 항공기체 밝음부터, 인재채용: 채용 공고 어두움부터).
+- 히어로 뒤 구역은 밝음(`.sec.light`) · 어두움을 번갈아 둔다(메인: 어두운 `#swarm` · `#future` 뒤 소식 밝음, 인재채용: 채용 공고 어두움부터).
 - 구역 색을 바꾸면 부품 색이 구역 토큰으로 따라온다. 토큰과 값이 다른 곳(인재채용 `.ben`)만 `.sec:not(.light)` 규칙으로 둔다.
 - 패턴은 `img/pattern2d.svg` 한 장(`tools/pattern/build.py`가 만듦)을 요소 크기 그대로 마스크로 깔고, `::before` 크기는 `round(…,1px)`로 정수 px.
 - 연혁 카드는 구운 `img/pattern2d-hx.webp`를 쓴다(history.css, Firefox 성능).
@@ -86,7 +86,6 @@ JS · 인라인 참조 속성(이름 보존): `--k` `--pin` `--open` `--d` `--dl
 - **곡선 없는 전환**(기본 `ease`: `.chip` 배경 .25s, aero · uav의 .3~.5s 등)은 그대로 둔다. `--ease-std`로 바꾸면 움직임이 바뀐다.
 - **`!important`**
   - site.css: `[hidden]` · `.ph.pv` 높이 · Lenis · `html.rv-now` · `[data-rv="rule"]` 그림자 · 움직임 줄임 규칙들
-  - index.css: `.fleet.drive .fl-track` · 움직임 줄임
   - uav.css: `.stage.m-all .phs`
 - **쓰지 않는 것**
   - `@layer`: `!important`의 우선순위가 층 사이에서 뒤집힌다.
