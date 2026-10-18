@@ -3,8 +3,7 @@
 `web/`을 claude.ai 아티팩트로 올리거나 게시본과 맞출 때 읽는다. 검사 방법은 verify.md, 도구 목록은 tools.md.
 
 - 게시 주소: https://claude.ai/artifact/8PVpxzCfkjLGqoRoqLs2tV — **여러 세션이 게시한다. 게시본이 기준이다.**
-- 2026-09-27 확인: 게시본 = v60(id `1790421930-d731`, 262개 · 약 96MB, 2026-09-26). 최근 게시: v58 2D 패턴 SVG · v59 3D 메모리 · 무인기 성능 · v60 전수 최적화(글꼴 조각 · 유휴 루프 정지). `_archive/pre-refactor-v60/`이 v60과 같은 내용이다(`video/`는 `web/video` 링크).
-- `web/` = 로컬 v60 + 미게시 리팩터(§5). Stage D 재개 시 라이브 목록 도구가 없어 동기화 미확인; 게시 전 1절을 반드시 수행한다.
+- 2026-10-18 게시: v61(id `1792333761-c311`, 283개) = `web/` = `_archive/live-v61/` — 리팩터(§5) · 군집 드론 메인 · 글꼴 k2 · 자폭 탑뷰. 그 전 v60(`1790421930-d731`) = `_archive/pre-refactor-v60/`. 두 스냅숏의 `video/`는 `web/video` 링크. 게시 전 1절을 반드시 수행한다.
 
 ## 1. 고치기 전: 게시본과 맞추기
 
@@ -19,7 +18,7 @@
    - `python3 tools/verify/check.py` — 크기 · 참조 · JS 구문 · 릴리스 URL. 식별자 갱신은 llm-workflow.md.
    - `python3 tools/data/fmtjson.py --check` — 1이면 인자 없이 돌려 정리.
    - `python3 tools/verify/fontset.py` — 1이면 site 조각에 없는 음절이 있음 → §4.
-   - `python3 tools/fonts/mkfonts.py --check` — 0 통과 · 1 다시 만들어야 함 · 3 안 쓰는 site 음절만 있음(화면 영향 없음, 지금 '촬' 1자) · 2 사용법 오류.
+   - `python3 tools/fonts/mkfonts.py --check` — 0 통과 · 1 다시 만들어야 함 · 3 안 쓰는 site 음절만 있음(화면 영향 없음) · 2 사용법 오류.
    - `python3 tools/aero3d/smoke.py` — 14쪽 오류 · HTTP ≥400 · 깨진 이미지가 모두 `[]`.
 3. **게시 직전 버전을 다시 확인한다**(Artifact `read`, path 없이 · 또는 `list`). 1단계 때와 버전 id가 다르면 1로 돌아간다.
 4. Artifact `publish`: `url`=게시 주소, `root`=`web/`, `file_path`=`web/index.html`, `files`에는 **바꾼 파일만**(게시 경로 → 원본 경로). 빠진 파일은 게시본에 그대로 남고, 지울 파일은 `null`로 둔다.
@@ -27,7 +26,7 @@
 
 ## 3. 한도 · 도구 버릇
 
-- 한 번에 255개 · 64MB 이하. 파일 하나는 텍스트 16MB, 바이너리(영상 · 이미지 · 글꼴) 15MB 이하.
+- 한 번에 255개 · 64MB 이하. 파일 하나는 텍스트 16MB, 바이너리(영상 · 이미지 · 글꼴) 15MB 이하. 임의 이진(.bin · octet-stream)은 서비스 안 함 → base64 텍스트(`data/swarm.txt`).
 - 게시본 전체(지금 `web/` 280개 · 약 97MB)는 한 번에 다시 올릴 수 없다 → 바꾼 파일만 올린다.
 - 게시 도구는 이 세션에서 게시본 index 쪽을 `read`로 **끝까지 읽기 전에는 거절**한다 → 읽고 다시 보낸다.
 - "내용이 같다"며 거절되면 **바꾸지 말고 그대로 다시 보낸다.**
@@ -45,11 +44,11 @@
 - 초기 표시: 국문 메인은 게시 틀의 CSS 전 크림색 프레임이 사라졌다. 외부 파일 분리로 느린 망에서는 UAV 무대·메인 영상 시작이 첫 표시보다 늦을 수 있다. index.js preload는 개선되어 유지했고, UAV preload는 효과가 없어 철회했다.
 - MRO 육지는 fetch 뒤 표시된다. preload는 WebKit 중복 요청 때문에 철회했다. 실패는 콘솔 `mro-land` 경고로 남긴다.
 
-## 5. 이번 리팩터(Stage A~D, 게시 전): 변경 목록은 매번 재생성
+## 5. 리팩터(Stage A~D, v61에 게시): 변경 목록은 매번 재생성
 
 - **새 파일 18:** `css/{index,aero,uav,mro,company,newsroom,careers}.css` · `img/mro-land.svg` · `js/{index,mro,newsroom,careers,a3d-paint,uav-data,uav-kit,uav-scenes1,uav-scenes2,uav}.js`
 - **바뀐 파일 25:** HTML 14쪽 전부 · `css/{site,history,fonts}.css` · `img/pattern2d.svg` · `data/{media,history}.json` · `js/{site,scroll-fx,history,a3d,a3d-craft}.js`
-- **현재 43개(추가 18 · 변경 25), 삭제 없음.** WOFF2 · 영상 · 나머지 이미지는 그대로다. fonts.css · pattern2d.svg는 값/형상을 보존하는 줄바꿈 변경이다.
+- **리팩터 43개(추가 18 · 변경 25).** 영상 · 나머지 이미지는 그대로다. pattern2d.svg는 형상을 보존하는 줄바꿈 변경이다.
 - 따로 올리면 깨지는 짝(그래서 전체 변경 목록을 한 게시로):
   - `js/site.js`(KA 도우미) ↔ 나머지 모든 쪽 JS
   - `js/scroll-fx.js`(`<style>` 주입 없앰) ↔ `css/uav.css` 끝의 `#seq` 등장 규칙
@@ -57,11 +56,11 @@
   - `js/a3d-craft.js` ↔ `js/a3d-paint.js`
   - `mro*.html`(빈 `<path class="land">`) ↔ `js/mro.js`(fetch로 채움) ↔ `img/mro-land.svg` · `css/mro.css`
   - 각 쪽 HTML ↔ 그 쪽 `css/<쪽>.css` · `js/<쪽>.js`
-- **2026-10-18 메인 군집 드론(swarm.md):** 새 `js/swarm-gl.js` · `js/swarm.js` · `data/swarm.bin`, 바뀐 `index*.html` · `css/index.css` · `js/index.js` · `js/scroll-fx.js`(메인 판정). 리팩터 묶음과 함께 올린다. 옛 메인 영상 `video/hero2-*`는 안 씀.
-- 목록 다시 뽑기(v60 기준, 루트):
+- **2026-10-18 메인 군집 드론(swarm.md):** 새 `js/swarm-gl.js` · `js/swarm.js` · `data/swarm.txt`, 바뀐 `index*.html` · `css/index.css` · `js/index.js` · `js/scroll-fx.js`. 글꼴 k2 · 자폭 탑뷰 `_top3`. 옛 메인 영상 `video/hero2-*`는 안 씀.
+- 목록 다시 뽑기(루트). 다음 게시는 v61 기준(`--baseline`), 기본값은 v60:
 
 ```sh
-python3 tools/verify/manifest.py --output _verification/refactor/stage-d/publish-manifest.json
+python3 tools/verify/manifest.py --baseline _archive/live-v61 --output _verification/refactor/stage-d/publish-manifest.json
 ```
 
 SHA-256 · 추가/변경/삭제 · 전송량이 기록된다. 라이브가 바뀌었으면 `--baseline`에 동기화한 기준본을 지정한다. Stage C의 41개 목록은 사용하지 않는다.

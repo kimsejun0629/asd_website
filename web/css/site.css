@@ -96,7 +96,7 @@ p{text-wrap:pretty;margin:0}
 /* ═══ 5. 카드 · 줄 · 칩 ═══ */
 /* .card: 사진 틀(.fr) 확대 + 화살표 · .row: 행(.go가 스며 나옴, .row-d 어두운 면 배경) · .chip: 거르개 단추(aria-pressed) */
 .card{display:flex;flex-direction:column;cursor:pointer}
-.card .fr{overflow:hidden;background:var(--cblue)}
+.card .fr{overflow:hidden}
 .card .fr img{display:block;width:100%;height:100%;object-fit:cover;transition:transform var(--t-img)}
 .card:hover .fr img{transform:scale(1.035)}
 .row{transition:background-color var(--t-ui)}

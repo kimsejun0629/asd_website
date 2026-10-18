@@ -2,7 +2,7 @@
 
 Korean Air Aerospace 사이트 리디자인. 결과물은 claude.ai 아티팩트로 게시한다.
 
-- 게시 주소: https://claude.ai/artifact/8PVpxzCfkjLGqoRoqLs2tV — 로컬 기준 v60 + 미게시 리팩터. 목록 · 라이브 확인: `docs/publish.md`.
+- 게시 주소: https://claude.ai/artifact/8PVpxzCfkjLGqoRoqLs2tV — v61(2026-10-18) = `web/`. 목록 · 라이브 확인: `docs/publish.md`.
 - 사용자와는 한국어로. 모든 쪽은 국문 · 영문 한 쌍(`x.html` ↔ `x-en.html`, 7쌍 14쪽).
 - 자세한 것은 필요할 때 `docs/`(아래 표). 옛 원문: `_archive/claude-md-v60.md`.
 
@@ -26,7 +26,7 @@ Korean Air Aerospace 사이트 리디자인. 결과물은 claude.ai 아티팩트
 - CSS는 `fonts.css` → `site.css` → 쪽 CSS의 막는 `<link>`. 규칙 순서도 캐스케이드의 일부다.
 - 쪽 스크립트는 body 끝의 동기 classic, 쪽마다 정해진 순서(`docs/motion.md` §3). classic은 IIFE + `'use strict'`(a3d*.js는 모듈, 예외: motion.md §1), 도우미는 `const {…}=window.KA`(가드 없음 → 함께 게시). 새 루프는 `KA.loop` + 깨우는 경로.
 - **주석은 한국어로 짧게.** CSS는 `/* */`만(`//`는 다음 규칙을 조용히 없앰). JS는 `/* */` 또는 공백 · `;{}(` 바로 뒤의 `//`만(mkfonts가 이 규칙으로 주석을 빼고 음절을 셈).
-- **생성 파일은 손으로 고치지 않는다:** `css/fonts.css` · `fonts/*`(mkfonts) · `img/pattern2d.*`(`tools/pattern/build.py`) · `img/aero/top-*`(`tools/render`) · `data/swarm.bin`(`tools/swarm`).
+- **생성 파일은 손으로 고치지 않는다:** `css/fonts.css` · `fonts/*`(mkfonts) · `img/pattern2d.*`(`tools/pattern/build.py`) · `img/aero/top-*`(`tools/render`) · `data/swarm.txt`(`tools/swarm`).
 
 - **읽기 범위 · 자동 검사:** `docs/llm-workflow.md`. 먼저 `python3 tools/verify/check.py`, 게시 전 `release.py` 확인.
 

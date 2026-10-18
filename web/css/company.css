@@ -28,7 +28,7 @@
 .hist-intro{grid-column:5/span 8}
 .locs{grid-column:1/-1;margin-top:80px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));column-gap:var(--gut)}
 .loc{display:flex;flex-direction:column;gap:22px}
-.loc .fr{aspect-ratio:722/440;overflow:hidden;background:var(--cblue)}
+.loc .fr{aspect-ratio:722/440;overflow:hidden}
 .loc .fr img{width:100%;height:100%;object-fit:cover;display:block;filter:grayscale(1) invert(.88) contrast(.92) brightness(.95);transition:transform var(--t-img)}
 .loc:hover .fr img{transform:scale(1.035)}
 .loc .n{font-size:30px;letter-spacing:-.025em}

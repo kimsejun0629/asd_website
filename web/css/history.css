@@ -38,7 +38,7 @@
 /* 연도 점을 자기 레이어로(WebKit만) — 고리가 카드 밖으로 번져 전환마다 카드 레이어를 다시 할당하던 것을 막음 */
 @supports (font:-apple-system-body){.hx-card::before{will-change:transform}}
 .hx-y{display:block;margin:0;padding-top:22px;font-size:clamp(38px,calc(var(--cw) * .14),76px);font-weight:300;line-height:1;letter-spacing:var(--ls-num);color:var(--cream)}
-.hx-ph{position:relative;margin-top:20px;height:var(--ih);overflow:hidden;background:var(--cblue)}
+.hx-ph{position:relative;margin-top:20px;height:var(--ih);overflow:hidden}
 .hx-ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;opacity:0;transition:opacity .9s var(--ease-std)}
 .hx-ph img.on{opacity:1}
 .hx-ph .n{position:absolute;right:10px;bottom:10px;padding:3px 8px;font-size:11px;font-weight:700;letter-spacing:.06em;color:var(--cream);background:rgb(var(--night-rgb) / .72);font-variant-numeric:tabular-nums}

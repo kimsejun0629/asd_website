@@ -31,7 +31,7 @@
 ## 3. 쪽마다 불러오는 순서
 | 쪽 | 순서 |
 |---|---|
-| index | site → scroll-fx → index → swarm-gl → swarm |
+| index | 머리 인라인(`sw-on`) → site → scroll-fx → index → swarm-gl → swarm |
 | aero | importmap → a3d.js(module, 파싱 뒤) → 인라인 대체 타이머 → site → scroll-fx |
 | uav | site → uav-data → uav-kit → uav-scenes1 → uav-scenes2 → uav → scroll-fx |
 | mro | site → scroll-fx → mro |

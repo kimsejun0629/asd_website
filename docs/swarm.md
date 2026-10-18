@@ -5,17 +5,17 @@
 | 장 | 형상(드론이 맡는 기체) | 글(`.sw-ch`) |
 |---|---|---|
 | 0 AI | 사람 흉상(어깨 위, 표정 없음) | h1 · 핵심 수치 카드 |
-| 1 무인기 | 편대: 다목적 스텔스기(선두) · 저피탐 무인편대기 ×2(좌우) · 중형 자폭무인기 ×3(앞 · 낮게) · 중고도무인기(뒤 · 높이) | 편대 카드 · 기체 이름표 |
-| 2 항공기체 | 보잉 787(새 도장 하늘색 동체 · 금색 = 대한항공 제작 부위) | 제작 부위 카드 |
+| 1 무인기 | 편대: 다목적 스텔스기(선두) · 저피탐 무인편대기 ×2(좌우) · 중형 자폭무인기 ×3(앞 · 낮게) · 중고도무인기(뒤 · 높이) | 무인기 9종 카드 · 기체 이름표 |
+| 2 항공기체 | 보잉 787(한 색, 도장 · 제작 부위 구분 없음) | 제작 사업 6종 카드(대표 부위 일부) |
 | 3 군용기 | 전자전기(Global 6500, 높이 · 멀리, 재밍 전파면) · UH-60(낮게 · 가까이, 로터 회전 · 패스트로프 강하) | 이름표 |
 
 ## 1. 파일
 
 - `web/js/swarm-gl.js` → `window.SW`: WebGL 점 스프라이트(작으면 LED 점, 13 → 26px에서 쿼드콥터 모양) · 2D 캔버스 대체 · 행렬 도우미. 버퍼는 드론마다 10칸(x y z · 크기 · 방향 · 밝기 · 불투명 · r g b).
 - `web/js/swarm.js`: 장 설정 `CFG` · 스크롤 진행 · 흩어짐 경로 · 첫 진입 연출 · 글 · 목차 · 이름표. 순서: site → scroll-fx → index → swarm-gl → swarm.
-- `web/data/swarm.bin`(약 250KB): `tools/swarm/build.py`가 만듦(손대지 않음). 형상 8개 = 흉상 · 중고도 · 스텔스 · 저피탐 · 자폭 · 787 · UH-60 · 전자전기, 형상마다 점 수가 다르고 순서는 섞여 있다(앞부분만 써도 고름).
-- 원본: 흉상 `assets/swarm/makehuman-base.obj`(MakeHuman 기본 메시, **CC0**, 받는 주소는 build.py 머리) · 기체 탑뷰 `web/img/sp/*_top2.webp` · `lw_2` · `mlm_top` · `aero/top-787-k26` · `tools/render/top_g6500.webp` · UH-60은 공개 제원으로 build.py가 그림(로터는 종류 3 = 회전).
-- CSS: `css/index.css`의 `#swarm` 묶음. 스크립트가 없거나 쪽 CSS가 옛 것(캐시)이면 `html.sw-on`을 떼고 글만 쌓는다.
+- `web/data/swarm.txt`(이진 약 250KB의 base64 · 약 340KB — 게시 호스트가 .bin을 서비스하지 않음, swarm.js가 풀어 씀): `tools/swarm/build.py`가 만듦(손대지 않음). 형상 8개 = 흉상 · 중고도 · 스텔스 · 저피탐 · 자폭 · 787 · UH-60 · 전자전기, 형상마다 점 수가 다르고 순서는 섞여 있다(앞부분만 써도 고름).
+- 원본: 흉상 `assets/swarm/makehuman-base.obj`(MakeHuman 기본 메시, **CC0**, 받는 주소는 build.py 머리) · 기체 탑뷰 `web/img/sp/*_top2.webp` · `lw_2` · `mlm_top3` · `aero/top-787-k26` · `tools/render/top_g6500.webp` · UH-60은 공개 제원으로 build.py가 그림(로터는 종류 3 = 회전).
+- CSS: `css/index.css`의 `#swarm` 묶음. `html.sw-on`은 `index*.html` 머리 인라인 스크립트가 첫 그리기 전에 붙인다(끝의 swarm.js가 붙이면 그사이 네 장 글이 보였다가 흐려지며 사라짐). swarm.js가 시작하지 못하면(`SW.run` 없음 — 스크립트 실패 · 쪽 CSS가 옛 것(캐시)) DOMContentLoaded에 떼고 글만 쌓는다.
 
 ## 2. 움직임
 
@@ -30,6 +30,6 @@
 
 ## 3. 바꿀 때
 
-- 형상 · 점 수: `tools/swarm/build.py`(`--preview 폴더`로 형상 한 장) → `swarm.bin`을 다시 게시. 이름은 그대로라 HTML의 `?v=` 릴리스 식별자로 캐시를 나눈다.
+- 형상 · 점 수: `tools/swarm/build.py`(`--preview 폴더`로 형상 한 장) → `swarm.txt`를 다시 게시. 빌드가 `index*.html` preload · `swarm.js` fetch의 `data/swarm.txt?v=`를 내용 해시(sha1 앞 8자)로 바꿔 캐시를 나눈다 → 세 파일도 함께 게시.
 - 문구에 새 한글 음절이 생기면 mkfonts(publish.md §4). 'Bombardier' · 'Global 6500'은 새 음절을 피하려고 영문으로 썼다.
 - 성능(2026-10-18, M4 Max · CPU 6배 느림 흉내): 모든 장 · 전환에서 120fps 유지.

@@ -32,7 +32,7 @@
 .vcard .d{font-size:13px;color:var(--ink80)}
 .bgrid{grid-column:1/-1;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));column-gap:var(--gut);row-gap:56px}
 .bro{display:flex;flex-direction:column;gap:16px}
-.bro .fr{aspect-ratio:4/3;overflow:hidden;background:var(--cblue)}
+.bro .fr{aspect-ratio:4/3;overflow:hidden}
 .bro .fr img{width:100%;height:100%;object-fit:cover;display:block;transition:transform var(--t-img)}
 .bro:hover .fr img{transform:scale(1.035)}
 .bro .t{font-size:20px;letter-spacing:-.015em}

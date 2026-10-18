@@ -1,4 +1,4 @@
-# 메인 군집 드론 형상 — 점 구름 생성기 → web/data/swarm.bin (js/swarm.js가 읽음)
+# 메인 군집 드론 형상 — 점 구름 생성기 → web/data/swarm.txt (js/swarm.js가 읽음)
 # 사용: python3 tools/swarm/build.py [--preview 폴더]
 #  · 사람(AI) 흉상: assets/swarm/makehuman-base.obj(MakeHuman 기본 메시, CC0)의 어깨 위 표면을 넓이 비례로 뽑음(얼굴은 다듬어 표정 없앰)
 #    없으면 https://raw.githubusercontent.com/makehumancommunity/makehuman/master/makehuman/data/3dobjs/base.obj 를 받아 둠
@@ -7,30 +7,31 @@
 # 파일: 'SWM2' · uint16 S · uint16 점 수 × S, 이어서 형상마다 (int16 x,y,z · int8 nx,ny,nz · uint8 속성) × 점 수
 #  좌표는 형상마다 [-1,1](가장 긴 변 = 2). 사람: x 오른쪽 · y 위 · z 앞. 기체: x 기수 · y 위 · z 오른쪽 날개
 #  속성: 아래 4비트 밝기(0~15), 위 4비트 종류(0 크림 · 1 금색 · 2 도장 하늘색 · 3 회전 로터)
-import sys, struct
+#  이 이진 내용을 base64(76자 줄)로 적음 — 게시 호스트가 .bin(application/octet-stream)을 서비스하지 않음
+import sys, struct, hashlib, re, base64
 from pathlib import Path
 import numpy as np
 from PIL import Image, ImageDraw
 
 ROOT = Path(__file__).resolve().parents[2]
-OUT = ROOT / 'web/data/swarm.bin'
+OUT = ROOT / 'web/data/swarm.txt'
+REFS = ['web/index.html', 'web/index-en.html', 'web/js/swarm.js']   # 'data/swarm.txt?v=…'를 쓰는 곳
 RNG = np.random.default_rng(1977)
 
 # 기체 설정 — x는 꼬리(0) → 기수(1) 비율, z · h는 그림 세로(날개폭) 비율
 #  body: 동체 반폭 상한 · tilt: 꼬리면 기울기 · lift: 높이 올림(T꼬리) · fins: 수직꼬리날개 다각형 [(x,h)…]
 #  gold: 금색 부위(대한항공 제작) · edge: 윤곽선 점 비율
-FIN_LM = [(.33, 0), (.47, 0), (.40, .13), (.36, .13)]
-FIN_LMT = [(.17, 0), (.26, 0), (.22, .07), (.18, .07)]
+FIN_LM = [(.40, 0), (.61, 0), (.52, .13), (.45, .13)]   # 중형 자폭(mlm_top3): 동체 옆 수직날개 — 탑뷰의 어두운 두 줄
+FIN_LMT = [(.025, 0), (.12, 0), (.075, .07), (.035, .07)]   # 날개 끝 수직날개 — 뒷전 뒤로 나온 판
 SHAPES = [
     dict(id='ai', n=6144),
     dict(id='muav', n=1536, src='web/img/sp/fs_top2.webp', body=.028, edge=.32, tilt=[dict(x=(0, .17), z=.03, ang=38)]),
     dict(id='stealth', n=1536, src='web/img/sp/st_top2.webp', body=.035, edge=.32),
     dict(id='lowus', n=2048, src='web/img/lw_2.webp', body=.105, edge=.28, tilt=[dict(x=(0, .26), z=.10, ang=58)]),
-    dict(id='lm', n=1920, src='web/img/sp/mlm_top.webp', body=.044, edge=.3,
-         fins=[dict(z=.25, poly=FIN_LM), dict(z=-.25, poly=FIN_LM), dict(z=.485, poly=FIN_LMT), dict(z=-.485, poly=FIN_LMT)]),
-    dict(id='civil', n=6144, src='web/img/aero/top-787-k26.webp', rot=-90, body=.048, edge=.24, livery=True,
-         tilt=[dict(x=(.18, .62), z=.05, ang=6)], fins=[dict(z=0, poly=[(.015, .045), (.16, .045), (.075, .20), (.03, .20)])],
-         gold=dict(tip=.86, aft=(.12, .30))),
+    dict(id='lm', n=1920, src='web/img/sp/mlm_top3.webp', body=.05, edge=.3,
+         fins=[dict(z=.075, poly=FIN_LM), dict(z=-.075, poly=FIN_LM), dict(z=.49, poly=FIN_LMT), dict(z=-.49, poly=FIN_LMT)]),
+    dict(id='civil', n=6144, src='web/img/aero/top-787-k26.webp', rot=-90, body=.048, edge=.24,
+         tilt=[dict(x=(.18, .62), z=.05, ang=6)], fins=[dict(z=0, poly=[(.015, .045), (.16, .045), (.075, .20), (.03, .20)])]),
     dict(id='uh60', n=3072),
     dict(id='g6500', n=3072, src='tools/render/top_g6500.webp', rot=-90, body=.047, edge=.28,
          lift=[dict(x=(0, .15), z=.05, dy=.13)], fins=[dict(z=0, poly=[(.02, .04), (.17, .04), (.09, .175), (.03, .175)])]),
@@ -376,8 +377,18 @@ def main():
         shapes.append(build_bust(cfg['n']) if cfg['id'] == 'ai' else build_plan(cfg))
         print(cfg['id'], cfg['n'])
     data = pack(shapes)
-    OUT.write_bytes(data)
-    print('→', OUT.relative_to(ROOT), len(data), 'B')
+    txt = base64.encodebytes(data)
+    OUT.write_bytes(txt)
+    print('→', OUT.relative_to(ROOT), len(data), 'B → base64', len(txt), 'B')
+    # 캐시: 주소의 ?v=를 내용 해시로 — 바뀌면 새 주소라 브라우저가 옛 파일을 쓰지 않음
+    v = hashlib.sha1(txt).hexdigest()[:8]
+    for f in REFS:
+        p = ROOT / f
+        s = p.read_text(encoding='utf-8')
+        t = re.sub(r'''(["'])data/swarm\.(?:bin|txt)(?:\?v=\w+)?(["'])''', rf'\1data/swarm.txt?v={v}\2', s)
+        if t != s:
+            p.write_text(t, encoding='utf-8')
+            print('  ?v=' + v, f)
     if '--preview' in args:
         preview(shapes, args[args.index('--preview') + 1])
 

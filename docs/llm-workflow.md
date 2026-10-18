@@ -24,7 +24,7 @@ python3 tools/fonts/mkfonts.py --check
 - `check.py`: CLAUDE.md 6.5 KB·AGENTS.md 2 KB·docs 문서 8 KiB 한도와 web의 HTML/CSS/JS/JSON/SVG 크기·긴 줄, HTML/CSS/모듈의 로컬 정적 참조, JS 18개 구문, 릴리스 URL. 동적 문자열 참조나 모든 런타임 동작을 증명하지는 않는다.
 - JSON은 레코드별 줄바꿈이면 35 KB 파일 한도의 예외다. 생성 SVG/CSS의 긴 줄은 예외가 아니다.
 - `fmtjson.py`: 무인자는 정리해서 쓰기, `--check`는 읽기만, 다른 인자는 exit 2.
-- `mkfonts.py --check`의 exit 3은 안 쓰는 site 음절만 남았다는 뜻이다. 현재 ‘촬’ 1개이며 누락은 없다. 이를 없애려고 글꼴 바이너리를 다시 만들 필요는 없다.
+- `mkfonts.py --check`의 exit 3은 안 쓰는 site 음절만 남았다는 뜻이다. 이를 없애려고만 글꼴을 다시 만들 필요는 없다(2026-10-18 k2 이후 0).
 - Node.js가 없으면 구문 검사를 생략해 PASS로 보고하지 않고 실패한다. 별도 번들 빌드나 npm 설치는 필요 없다.
 
 ## 릴리스와 비교

@@ -83,5 +83,5 @@ A='http://[::1]:8768/_archive/refactor-stage-a/' WORKERS=3 tools/verify/run_all.
 
 ## 6. 글꼴 불변식
 
-- `python3 tools/verify/fontset.py [web 폴더]`: 원문(주석 · `fonts.load(…)` 제외)의 한글 음절이 모두 site 조각에 있으면 0. 지금 `쓰인 514 · site 515 · 없는 0 · 안 쓰는 1('촬')`.
+- `python3 tools/verify/fontset.py [web 폴더]`: 원문(주석 · `fonts.load(…)` 제외)의 한글 음절이 모두 site 조각에 있으면 0. 지금(k2) `쓰인 513 · site 513 · 없는 0 · 안 쓰는 0`.
 - `python3 tools/fonts/mkfonts.py --check`: 0 · 1 · 3 · 2(publish.md §2). 리팩터 뒤 음절 집합이 바뀌면 글꼴을 다시 만들기 전에 원인(옮긴 주석 · 문구)부터 찾는다.

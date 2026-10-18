@@ -19,7 +19,7 @@
 .mx-blk{grid-column:1/-1;margin-top:96px}
 .mx-bars{margin-top:32px;display:flex;flex-direction:column}
 .mb{display:grid;grid-template-columns:clamp(96px,10vw,150px) minmax(130px,1.6fr) 7fr minmax(90px,1fr);grid-template-areas:"ph hd tr nv" "ph hd mt mt";column-gap:var(--gut);row-gap:10px;align-items:center;padding:22px 0;box-shadow:inset 0 1px 0 var(--ln)}
-.mb .ph0{grid-area:ph;aspect-ratio:3/2;overflow:hidden;background:var(--pan);align-self:start}
+.mb .ph0{grid-area:ph;aspect-ratio:3/2;overflow:hidden;align-self:start}
 .mb .ph0 img{display:block;width:100%;height:100%;object-fit:cover;transition:transform var(--t-img)}
 .mb:hover .ph0 img{transform:scale(1.05)}
 .mb .hd{grid-area:hd;display:flex;flex-direction:column;gap:6px;align-self:start}
@@ -104,7 +104,7 @@
 /* 창정비 기종 사진 */
 .mx-gal{grid-column:1/-1;margin-top:48px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));column-gap:var(--gut);row-gap:36px}
 .gc{margin:0;display:flex;flex-direction:column;gap:14px}
-.gc .fr{aspect-ratio:3/2;overflow:hidden;background:var(--pan)}
+.gc .fr{aspect-ratio:3/2;overflow:hidden}
 .gc .fr img{display:block;width:100%;height:100%;object-fit:cover;transition:transform var(--t-img)}
 .gc:hover .fr img{transform:scale(1.04)}
 .gc figcaption{display:flex;flex-direction:column;gap:6px}
@@ -114,10 +114,10 @@
 /* 성능개량 BEFORE → AFTER 사진 */
 .mu .pair{margin-top:10px;display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);column-gap:16px;align-items:start}
 .mu .pair figure{margin:0;display:flex;flex-direction:column;gap:10px}
-.mu .pair .fr{aspect-ratio:3/2;overflow:hidden;background:var(--pan)}
+.mu .pair .fr{aspect-ratio:3/2;overflow:hidden}
 .mu .pair img{display:block;width:100%;height:100%;object-fit:cover;transition:opacity 1s var(--rv-ease) calc(var(--d,0s) + .45s),transform 1.3s var(--rv-ease) calc(var(--d,0s) + .45s)}
 .mu .pair .pa2 img{transition-delay:calc(var(--d,0s) + .8s)}
-.mu .pair .tbd{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(var(--ln0) 1px,transparent 1px) 0 0/20px 20px,linear-gradient(90deg,var(--ln0) 1px,transparent 1px) 0 0/20px 20px}
+.mu .pair .tbd{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(var(--ln0) 1px,transparent 1px) 0 0/20px 20px,linear-gradient(90deg,var(--ln0) 1px,transparent 1px) 0 0/20px 20px,var(--pan)}
 .mu .pair .tbd svg{width:78%;height:78%;overflow:visible}
 .mu .pb .tbd .mk,.mu .pb .tbd .mw,.mu .pb .tbd .mn,.mu .pb .tbd .md{display:none}
 .mu .pair figcaption{display:flex;flex-direction:column;gap:4px}

@@ -1,6 +1,6 @@
 /* 메인 군집 드론 모션(#swarm) — 사람(AI) 흉상 → 무인기 편대 → 항공기체(787) → 군용기(전자전기 · UH-60)
    스크롤 진행 P = 장 번호(소수 부분 = 흩어졌다 모이는 중). 처음 불러오면 흩어진 드론이 흉상으로 모임
-   장 하나 = 기체 여럿(m): 드론을 몫(n)대로 나눠 각 기체 형상을 맡김. 점 구름: data/swarm.bin(tools/swarm/build.py)
+   장 하나 = 기체 여럿(m): 드론을 몫(n)대로 나눠 각 기체 형상을 맡김. 점 구름: data/swarm.txt(이진의 base64, tools/swarm/build.py)
    그리기: swarm-gl.js(window.SW) · 순서: site → scroll-fx → index → swarm-gl → 이 파일 */
 (()=>{
 'use strict';
@@ -16,7 +16,7 @@ const root=document.documentElement;root.classList.add('sw-on');
 if(getComputedStyle(cv).position!=='absolute'){root.classList.remove('sw-on');return}
 const narrow=matchMedia(MQ.narrow);
 
-/* 장 설정 — 형상 s: swarm.bin 순서(0 사람 · 1 중고도 · 2 스텔스 · 3 저피탐 · 4 자폭 · 5 787 · 6 UH-60 · 7 전자전기)
+/* 장 설정 — 형상 s: 점 구름 순서(0 사람 · 1 중고도 · 2 스텔스 · 3 저피탐 · 4 자폭 · 5 787 · 6 UH-60 · 7 전자전기)
    m: 기체 [{s, n 몫, p 편대 안 위치(x 기수 · y 고도 · z 오른쪽), sc 배율, yw 기수 틀기, j 같은 기종 몇 번째, tag:'tail' 이름표를 꼬리 끝에}] · fx: 기체(of)에 딸린 연출(jam 재밍 전파면 · rope 패스트로프)
    tilt: 편대를 카메라 쪽으로 눕힘 · hd: 진행 방향 · roll: 기울임 · 화면 영역(-1~1, 위 +) — pc: PC [반폭,y0,y1](가로는 가운데 CX 기준, center()) · ph: 폰 [x0,x1,y0,y1] */
 const FOV=30*Math.PI/180,D=6.2,TH=Math.tan(FOV/2);
@@ -28,7 +28,7 @@ const CFG=[
     {s:3,n:.15,p:[-.55,0,.85],sc:.42},{s:3,n:.15,p:[-.55,0,-.85],sc:.42,j:1},
     {s:4,n:.085,p:[1.05,-.2,.5],sc:.2,yw:.05},{s:4,n:.085,p:[1.25,-.24,0],sc:.2,j:1},{s:4,n:.085,p:[1.05,-.2,-.5],sc:.2,yw:-.05,j:2},
     {s:1,n:.225,p:[-1.45,.5,0],sc:.74}]},
-  {tilt:.92,hd:.3,roll:.06,gold:1,pc:[.55,-.42,.78],ph:[-.94,.94,.06,.76],m:[{s:5,n:1}]},
+  {tilt:.92,hd:.3,roll:.06,pc:[.55,-.42,.78],ph:[-.94,.94,.06,.76],m:[{s:5,n:1}]},
   /* 군용기: 전자전기(높이 · 멀리)는 적 방공망 밖에서 스탠드오프 재밍 — 전파면이 퍼져 나감, UH-60(낮게 · 가까이)은 특수작전 — 양쪽 문에서 대원이 패스트로프로 강하 */
   {tilt:.7,hd:0,roll:0,pc:[.5,-.74,.66],ph:[-.94,.94,-.1,.66],m:[
     {s:7,n:.38,p:[-.35,1.1,-1.3],sc:.56,yw:.45},
@@ -73,7 +73,7 @@ const tf=(G,x,y,z,F,o)=>{o[0]=(G[0]*x+G[3]*y+G[6]*z)*F.s+F.x;o[1]=(G[1]*x+G[4]*y
 const FIT=CFG.map(()=>({s:1,x:0,y:0,x0:-1,x1:1})),V3=[0,0,0,0];
 function formPos(k,t,out,F,idle){
   const c=CFG[k],G=rotOf(k,t,idle),mi=MI[k],li=LI[k],w=idle&&!reduce,cnt=CNT[k];
-  const glow=c.gold&&w?.82+.18*Math.sin(t*2.4):1,rot=w?t*2.6:0;
+  const rot=w?t*2.6:0;
   const L=c.m.map((m,q)=>{   /* 기체마다: 편대 회전 × 자기 틀기, 위치(위아래 흔들림) */
     if(m.fx)return null;
     const M=m.yw||w?m3(G,m3(ry(m.yw||0),rx(w?.04*Math.sin(t*.7+q*1.7):0))):G;
@@ -92,7 +92,7 @@ function formPos(k,t,out,F,idle){
     const n0=N3[j*3],n1=N3[j*3+1],n2=N3[j*3+2];
     if(c.human){const rim=1-Math.abs(M[2]*n0+M[5]*n1+M[8]*n2),up=M[1]*n0+M[4]*n1+M[7]*n2;br=sh.T[j]*(.58+.5*rim*rim)*(.82+.28*up)}   /* 가장자리 빛 × 위에서 오는 빛 */
     else br=sh.T[j]*(.86+.14*(M[1]*n0+M[4]*n1+M[7]*n2));
-    out[o+3]=Math.min(1,cl===1?br*glow+.2:cl===2?br+.15:br);
+    out[o+3]=Math.min(1,cl===1?br+.2:cl===2?br+.15:br);
     const cc=COL[cl];out[o+4]=cc[0];out[o+5]=cc[1];out[o+6]=cc[2];out[o+7]=e.ang;
   }
 }
@@ -144,9 +144,11 @@ function fit(){
 }
 
 /* ── 데이터 ── 'SWM2' · uint16 S · uint16 점 수 × S · 형상마다 (int16 xyz · int8 nxyz · uint8 속성) × 점 수 */
+/* swarm.txt → 이진(게시 호스트가 .bin을 서비스하지 않아 base64로 둠) */
+const unb64=t=>{const s=atob(t.replace(/\s+/g,'')),u=new Uint8Array(s.length);for(let i=0;i<s.length;i++)u[i]=s.charCodeAt(i);return u.buffer};
 function parse(ab){
   const dv=new DataView(ab);
-  if(String.fromCharCode(dv.getUint8(0),dv.getUint8(1),dv.getUint8(2),dv.getUint8(3))!=='SWM2')throw new Error('swarm.bin');
+  if(String.fromCharCode(dv.getUint8(0),dv.getUint8(1),dv.getUint8(2),dv.getUint8(3))!=='SWM2')throw new Error('swarm.txt');
   const S=dv.getUint16(4,true),out=[];let o=6+S*2;
   for(let s=0;s<S;s++){
     const n=dv.getUint16(6+s*2,true),P=new Float32Array(n*3),Nn=new Float32Array(n*3),T=new Float32Array(n),C=new Uint8Array(n);let hx=0,hz=0,hn=0;
@@ -321,6 +323,7 @@ sec.querySelectorAll('a[href="#swarm-uav"]').forEach(a=>a.addEventListener('clic
   cue.addEventListener('transitionend',e=>{if(e.target===cue&&e.propertyName==='opacity')rest()});
   const hide=()=>{const o=scrollY>40;if(o===cue.classList.contains('off'))return;cue.classList.toggle('off',o);clearTimeout(zt);if(o)zt=setTimeout(()=>{if(getComputedStyle(cue).opacity==='0')rest()},700);else cue.classList.remove('idle')};
   addEventListener('scroll',hide,{passive:true});hide()}
-fetch('data/swarm.bin').then(r=>{if(!r.ok)throw new Error(r.status);return r.arrayBuffer()}).then(ab=>{SH=parse(ab);assign();fit();t0=0;wake()})
+SW.run=1;   /* 시작함 — 없으면 머리 인라인 스크립트가 DOMContentLoaded에 sw-on을 뗌(index*.html) */
+fetch('data/swarm.txt?v=3a40d855').then(r=>{if(!r.ok)throw new Error(r.status);return r.text()}).then(t=>{SH=parse(unb64(t));assign();fit();t0=0;wake()})
   .catch(e=>{console.warn('swarm',e);root.classList.add('sw-nodata');CH.forEach((c,i)=>c.classList.toggle('on',i===0))});
 })();

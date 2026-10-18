@@ -9,7 +9,7 @@
 |---|---|
 | `web/` | 사이트 원본 = 게시 트리. 여기만 게시한다. 문서 · 도구를 넣지 않는다 |
 | `docs/` | 이 문서들(게시 안 함, mkfonts도 읽지 않음) |
-| `dev/` | 개발 페이지(게시 안 함, `../web/js/…`를 불러옴): `a3d-debug.html`(3D 한 대 정지 렌더, 3d.md §4) · `symtest.html`(태극 도형) · `gltest.html`(WebGL 빈 페이지 — `nan2` · `probe_v2` · `probe_parts2`가 여기서 a3d-craft.js를 불러옴) |
+| `dev/` | 개발 쪽(게시 안 함, `../web/js/…` 사용): `a3d-debug.html`(3D 한 대 정지, 3d.md §4) · `symtest.html`(태극 도형) · `edit.html`(편집 모드, edit.md) · `gltest.html`(WebGL 빈 쪽 — `nan2` · `probe_v2` · `probe_parts2`가 a3d-craft.js를 불러옴) |
 | `tools/` | 빌드 · 검사 스크립트(§2 · §3) |
 | `research/` | `livery25/`(livery.md) · `ac/`(기종별 공항 계획 문서: 3면도 · 치수) · `ref3d/`(3D 참고 사이트 캡처: `refs/` jpg 363 · `archer_tt.mp4` · `joby.mp4` · `log_*.txt`) · 참고 사이트 캡처(`bm*` · `ref2` · `sub` · `measure` · `mobile` · `hanwha` · `fetched-pages` 등) · 옛 사이트 자료(`kal*` · `old-site-screens` · `mroimg` · `leaf` · `aeroimg`) |
 | `assets/` | 원본 영상 · 사진 · 리플렛 · 발표자료, 한진그룹체 원본(`HanjinGroupSans-*.woff2`, mkfonts가 읽음) |
@@ -28,7 +28,7 @@
 | `tools/fonts/mkfonts.py` | 한진그룹체를 겹치지 않는 unicode-range 3조각 + `web/css/fonts.css`로(publish.md §4). `--check`. `import`로 `syl()` · `used()`만 쓰면 fontTools가 필요 없다 |
 | `tools/data/fmtjson.py` | `web/data/*.json`을 레코드 한 줄씩으로(값 · 순서 그대로). `--check` |
 | `tools/pattern/build.py` | 브랜드 2D 패턴(§4) |
-| `tools/swarm/build.py` | 메인 군집 드론 형상 점 구름 → `web/data/swarm.bin`(swarm.md). `--preview 폴더` |
+| `tools/swarm/build.py` | 메인 군집 드론 형상 점 구름 → `web/data/swarm.txt`(swarm.md). `--preview 폴더` |
 | `tools/pattern/shot.py` | 패턴 요소만 흰색으로 드러내 캡처(탭은 `careers.html#process`처럼). **`OLD=1`은 깨져 있다**: 마스크를 `/web/img/pattern.webp`에서 읽는데 그 파일은 `_archive/replaced-20260926/`로 갔다 |
 | `tools/render/` | 위에서 본 기체: `masks.py`(svgs.json → `m_*.png`) → `shade2.py <기종…>` → `top_<기종>.webp`. **`tools/render`에서 실행**(cwd의 `svgs.json` · `m_*.png` · `meta.json` · `HanjinGroupSans-Bold.ttf`를 읽음). 인자 없이 돌리면 제외된 g6500까지 만드니 기종을 지정한다. 결과는 **새 이름으로 복사**해 `web/img/aero/top-<기종>-k26.webp`(AH-6만 `top-ah6.webp`) — aero 3D 대체 목록이 쓴다(`top_g6500`은 swarm 원본) |
 | `tools/hv/` | 영상 인코딩: `enc.sh` · `encF.sh`(2-pass x264) · `track.py`(기체 중심 키프레임 → `fcF*.txt`, encF.sh가 읽음) · `cuts.txt` · `fc*.txt`(입력). 두 .sh의 `FF`와 `S`(`cd` 할 작업 폴더)는 옛 세션 scratchpad 경로다 → `FF=tools/pylib/imageio_ffmpeg/binaries/ffmpeg-macos-aarch64-v7.1`, `S`는 출력 폴더(`_out/hv` 등)로 바꿔 쓴다 |
