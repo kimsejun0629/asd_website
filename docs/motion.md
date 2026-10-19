@@ -31,7 +31,7 @@
 ## 3. 쪽마다 불러오는 순서
 | 쪽 | 순서 |
 |---|---|
-| index | 머리 인라인(`sw-on`) → site → scroll-fx → index → swarm-gl → swarm |
+| index | 머리 인라인(`sw-on`) → site → scroll-fx → index → swarm-gl → swarm-ai → swarm |
 | aero | importmap → a3d.js(module, 파싱 뒤) → 인라인 대체 타이머 → site → scroll-fx |
 | uav | site → uav-data → uav-kit → uav-scenes1 → uav-scenes2 → uav → scroll-fx |
 | mro | site → scroll-fx → mro |
@@ -42,7 +42,7 @@
 순서가 중요한 까닭:
 - site.js가 `.subnext` · `.ph.bare` · `hidden`을 먼저 만든다.
 - careers는 `#jobList`, uav는 `.cht` 등을 **동기로** 채운다. 그래야 scroll-fx의 첫 `tagAll()` · `#seq` 태그가 이를 본다.
-- index.js는 scroll-fx 뒤다. 메인 순서는 scroll-fx가 먼저 등록하고, `#nws`는 그 MutationObserver를 거친다. 군집 드론(swarm-gl → swarm)은 맨 끝(swarm.md).
+- index.js는 scroll-fx 뒤다. 메인 순서는 scroll-fx가 먼저 등록하고, `#nws`는 그 MutationObserver를 거친다. 군집 드론(swarm-gl → swarm-ai → swarm)은 맨 끝(swarm.md).
 - history는 scroll · resize 리스너 순서 때문에 scroll-fx 앞이다.
 
 ## 4. 쉬는 동안 멈추는 루프(`KA.loop`)

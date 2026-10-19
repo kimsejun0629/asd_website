@@ -2,7 +2,7 @@
 
 Korean Air Aerospace 사이트 리디자인. 결과물은 claude.ai 아티팩트로 게시한다.
 
-- 게시 주소: https://claude.ai/artifact/8PVpxzCfkjLGqoRoqLs2tV — v61(2026-10-18) = `web/`. 목록 · 라이브 확인: `docs/publish.md`.
+- 게시 주소: https://claude.ai/artifact/8PVpxzCfkjLGqoRoqLs2tV — v62(2026-10-19) = `web/`. 목록 · 라이브 확인: `docs/publish.md`.
 - 사용자와는 한국어로. 모든 쪽은 국문 · 영문 한 쌍(`x.html` ↔ `x-en.html`, 7쌍 14쪽).
 - 자세한 것은 필요할 때 `docs/`(아래 표). 옛 원문: `_archive/claude-md-v60.md`.
 
@@ -49,7 +49,7 @@ Korean Air Aerospace 사이트 리디자인. 결과물은 claude.ai 아티팩트
 ## 사이트 지도 (`web/`)
 
 - **공통:** `css/fonts.css` · `css/site.css`, `js/site.js`(머리글 · 바닥글 · 메뉴 · 영상, `window.KA`) · `js/scroll-fx.js`(Lenis `window.KA_LENIS` + 순차 등장).
-- `index`(`css/index.css` · `js/index.js` · `swarm-gl` → `swarm`): `#swarm`(군집 드론 4장) → `#future` → `#news`(`data/media.json`) → `#contact`.
+- `index`(`css/index.css` · `js/index.js` · `swarm-gl` → `swarm-ai` → `swarm`): `#swarm`(군집 드론 4장) → `#future` → `#news`(`data/media.json`) → `#contact`.
 - `aero`(`css/aero.css` · 모듈 `js/a3d.js` → `a3d-stage` · `a3d-craft` → `a3d-geo` · `a3d-paint` · `a3d-sym`): `#mg` → `#a3d` → `#aero-more`.
 - `uav`(`css/uav.css` · `js/uav-data` → `uav-kit` → `uav-scenes1` → `uav-scenes2` → `uav`): `#seq`(9장) → `#uav-more`.
 - `mro`(`css/mro.css` · `js/mro.js`, 육지 `img/mro-land.svg`): `#mg` → `#depot` · `#uh60` · `#upgrade` · `#next` → `#mro-more`.

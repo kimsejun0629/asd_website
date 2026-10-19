@@ -38,6 +38,12 @@ const CFG=[
 /* 팔레트(0~1): 크림 · 금색 강조(#C2A673) · 도장 하늘색(#53AAE2) · 로터(크림) · 드론 몸체 크림80 */
 const COL=[[192,183,171],[194,166,115],[83,170,226],[192,183,171]].map(c=>c.map(v=>v/255)),FRAME=[161,154,145].map(v=>v/255*.85);
 const SZ=.017;   /* 드론 크기(월드) — 형상 거리에서 점 약 3px */
+/* 사람(AI) 장 — 흉상 좌표(build.py 정규화: 목 y≈0 · 턱 .05 · 정수리 .99, z 앞 +)
+   고개: 목 위 점을 목 중심(NECK)에서 굽혀 돌림 — 마우스가 창 안이면 커서 쪽을 보고, 아니면 천천히 둘러봄
+   신경 신호(swarm-ai.js): 생각이 드론에서 드론으로 건너가며 금색 실선을 남김 — 받은 드론은 반짝이며 커지고 바깥으로 조금. 커서가 닿거나 누른 드론에서도 생각이 남
+   이 장은 드론 i = 흉상 점 i(assign) — 신호 · 반짝임은 드론 번호로 씀 */
+const NECK=[0,-.02,-.1],HEAD=[0,.5,.05];
+let gy=0,gp=0,ms=false,AI=null,cx0=0,cy0=0,mv=false,pd=null,tq=-9,tk=-9;   /* 고개 돌림 · 숙임(라디안) · 마우스가 창 안 · 신경 신호 · 커서(px) · 움직였나 · 누른 자리 · 마지막 닿음 · 마지막 찾기 */
 
 let R=null;try{R=SW.gl(cv)}catch(e){R=null}
 if(!R)R=SW.c2d(cv);
@@ -62,18 +68,20 @@ const buf=new Float32Array(NU*SW.ST);
 const rx=a=>{const c=Math.cos(a),s=Math.sin(a);return [1,0,0, 0,c,s, 0,-s,c]};       /* 열 우선 3×3 */
 const ry=a=>{const c=Math.cos(a),s=Math.sin(a);return [c,0,-s, 0,1,0, s,0,c]};
 const m3=(a,b)=>{const o=new Array(9);for(let c=0;c<3;c++)for(let r=0;r<3;r++)o[c*3+r]=a[r]*b[c*3]+a[3+r]*b[c*3+1]+a[6+r]*b[c*3+2];return o};
+const bodyY=(t,w)=>-.32+(w?.3*Math.sin(t*.21):0);   /* 흉상 몸 돌림 */
 function rotOf(k,t,idle){   /* 장 k 편대 전체의 회전(시간 t의 흔들림 포함) */
   const c=CFG[k],w=idle&&!reduce;
-  if(c.human)return ry(-.32+(w?.3*Math.sin(t*.21):0));
+  if(c.human)return ry(bodyY(t,w));
   return m3(rx(c.tilt),m3(ry(c.hd+(w?.035*Math.sin(t*.37):0)),rx(c.roll+(w?.05*Math.sin(t*.53):0))));
 }
 const tf=(G,x,y,z,F,o)=>{o[0]=(G[0]*x+G[3]*y+G[6]*z)*F.s+F.x;o[1]=(G[1]*x+G[4]*y+G[7]*z)*F.s+F.y;o[2]=(G[2]*x+G[5]*y+G[8]*z)*F.s;return o};
 
 /* ── 형상 위치 ── out: 드론마다 8칸(x y z · 밝기 · r g b · 방향) */
-const FIT=CFG.map(()=>({s:1,x:0,y:0,x0:-1,x1:1})),V3=[0,0,0,0];
+const FIT=CFG.map(()=>({s:1,x:0,y:0,x0:-1,x1:1})),V3=[0,0,0,0],HR=new Float32Array(256*4);   /* HR: 고개 회전표(몫 단계마다 cos · sin) */
 function formPos(k,t,out,F,idle){
   const c=CFG[k],G=rotOf(k,t,idle),mi=MI[k],li=LI[k],w=idle&&!reduce,cnt=CNT[k];
-  const rot=w?t*2.6:0;
+  const rot=w?t*2.6:0,hm=c.human&&w,GW=hm&&AI?AI.glow:null;
+  if(hm)for(let s=0;s<256;s++){const p=gp*s/255,y=gy*s/255;HR[s*4]=Math.cos(p);HR[s*4+1]=Math.sin(p);HR[s*4+2]=Math.cos(y);HR[s*4+3]=Math.sin(y)}
   const L=c.m.map((m,q)=>{   /* 기체마다: 편대 회전 × 자기 틀기, 위치(위아래 흔들림) */
     if(m.fx)return null;
     const M=m.yw||w?m3(G,m3(ry(m.yw||0),rx(w?.04*Math.sin(t*.7+q*1.7):0))):G;
@@ -85,15 +93,25 @@ function formPos(k,t,out,F,idle){
     if(m.fx){fxPos(c,m,L[m.of],G,F,li[i],cnt[q],w?t:0,V3);
       out[o]=V3[0];out[o+1]=V3[1];out[o+2]=V3[2];const g=m.fx==='jam',cc=COL[g?1:0];out[o+3]=V3[3];out[o+4]=cc[0];out[o+5]=cc[1];out[o+6]=cc[2];out[o+7]=1.5708;continue}
     const sh=SH[m.s],e=L[q],M=e.M,j=li[i],P3=sh.P,N3=sh.N,cl=sh.C[j];
-    let a=P3[j*3],b=P3[j*3+1],d=P3[j*3+2];
+    let a=P3[j*3],b=P3[j*3+1],d=P3[j*3+2],n0=N3[j*3],n1=N3[j*3+1],n2=N3[j*3+2],g=0;
     if(cl===3&&m.rotor){const cs=Math.cos(rot),sn=Math.sin(rot),ax=a-sh.hx,az=d-sh.hz;a=sh.hx+ax*cs-az*sn;d=sh.hz+ax*sn+az*cs}   /* 주로터 회전 */
+    if(hm){
+      const k=sh.hw[j];
+      if(k>0){   /* 고개: 숙임(x축) → 돌림(y축), 몫 k만큼 — 목이 굽음. 법선도 같이 */
+        const cp=HR[k*4],sp=HR[k*4+1],cy=HR[k*4+2],sy=HR[k*4+3],x=a-NECK[0],y=b-NECK[1],z=d-NECK[2],y2=cp*y-sp*z,z2=sp*y+cp*z;
+        a=cy*x+sy*z2+NECK[0];b=y2+NECK[1];d=-sy*x+cy*z2+NECK[2];
+        const m1=cp*n1-sp*n2,m2=sp*n1+cp*n2;n1=m1;n2=-sy*n0+cy*m2;n0=cy*n0+sy*m2;
+      }
+      if(GW&&GW[i]>.003){g=GW[i];a+=n0*g*.02;b+=n1*g*.02;d+=n2*g*.02}   /* 신호 받은 드론: 바깥으로 조금 */
+    }
     a*=e.sc;b*=e.sc;d*=e.sc;
     out[o]=(M[0]*a+M[3]*b+M[6]*d+e.o[0])*F.s+F.x;out[o+1]=(M[1]*a+M[4]*b+M[7]*d+e.o[1])*F.s+F.y;out[o+2]=(M[2]*a+M[5]*b+M[8]*d+e.o[2])*F.s;
-    const n0=N3[j*3],n1=N3[j*3+1],n2=N3[j*3+2];
-    if(c.human){const rim=1-Math.abs(M[2]*n0+M[5]*n1+M[8]*n2),up=M[1]*n0+M[4]*n1+M[7]*n2;br=sh.T[j]*(.58+.5*rim*rim)*(.82+.28*up)}   /* 가장자리 빛 × 위에서 오는 빛 */
+    if(c.human){const fz=M[2]*n0+M[5]*n1+M[8]*n2,rim=1-Math.abs(fz),up=M[1]*n0+M[4]*n1+M[7]*n2;FC[i]=fz;br=sh.T[j]*(.58+.5*rim*rim)*(.82+.28*up)+g*.9}   /* 가장자리 빛 × 위에서 오는 빛 + 신호. FC: 카메라 쪽을 보는 정도(뒤쪽 신호 선은 흐리게) */
     else br=sh.T[j]*(.86+.14*(M[1]*n0+M[4]*n1+M[7]*n2));
     out[o+3]=Math.min(1,cl===1?br+.2:cl===2?br+.15:br);
-    const cc=COL[cl];out[o+4]=cc[0];out[o+5]=cc[1];out[o+6]=cc[2];out[o+7]=e.ang;
+    const cc=COL[cl];out[o+7]=e.ang;
+    if(g>.01){const f=Math.min(1,g*1.2),G1=COL[1];out[o+4]=cc[0]+(G1[0]-cc[0])*f;out[o+5]=cc[1]+(G1[1]-cc[1])*f;out[o+6]=cc[2]+(G1[2]-cc[2])*f}
+    else{out[o+4]=cc[0];out[o+5]=cc[1];out[o+6]=cc[2]}
   }
 }
 /* 기체에 딸린 연출 — j번째 점의 월드 좌표 · 밝기를 o[0..3]에
@@ -125,7 +143,7 @@ function center(){
   CH.forEach(c=>{const t=c.querySelector('.sw-tx'),d=c.querySelector('.sw-card');if(t&&t.offsetWidth)tr=Math.max(tr,t.getBoundingClientRect().right-sr.left);if(d&&d.offsetWidth)cl=Math.min(cl,d.getBoundingClientRect().left-sr.left)});
   CX=Math.max(-.2,Math.min(.25,((cssW/2)*.65+((tr+cl)/2)*.35)/cssW*2-1));stage.style.setProperty('--cx',(50+CX*50).toFixed(1)+'%');
 }
-const TMP=new Float32Array(NU*8);
+const TMP=new Float32Array(NU*8),FC=new Float32Array(NU),SEG=new Float32Array(2400*10);   /* SEG: 신호 선분(swarm-gl) */
 function fit(){
   if(!SH)return;
   const ph=narrow.matches||asp<.9,hw=D*TH*asp,hh=D*TH;
@@ -158,6 +176,9 @@ function parse(ab){
     let y0=1;for(let i=0;i<n;i++)if(C[i]!==3&&P[i*3+1]<y0)y0=P[i*3+1];
     out.push({P,N:Nn,T,C,n,hx:hn?hx/hn:0,hz:hn?hz/hn:0,y0});
   }
+  /* 흉상 점마다 고개 몫(목 아래 0 → 턱 위 1, 255단계 — 프레임마다 단계별 회전표를 씀) */
+  const h=out[0];h.hw=new Uint8Array(h.n);
+  for(let i=0;i<h.n;i++){const k=Math.min(1,Math.max(0,(h.P[i*3+1]+.06)/.28));h.hw[i]=Math.round(k*k*(3-2*k)*255)}
   return out;
 }
 /* 장마다 드론을 기체 몫대로 나눔 — 같은 기종 여러 대(j)는 형상 점을 겹치지 않게 이어서 씀 */
@@ -206,8 +227,21 @@ function frame(now){
   const yw=reduce?0:cmx*.07,pt=reduce?0:cmy*.045;
   vp=SW.mul(SW.persp(FOV,asp,.1,40),SW.lookAt([Math.sin(yw)*Math.cos(pt)*D,Math.sin(pt)*D,Math.cos(yw)*Math.cos(pt)*D],[0,0,0],[0,1,0]));
   const k=Math.min(NS-1,Math.floor(P)),u=k>=NS-1?0:P-k;
+  if(k===0&&!reduce){   /* AI 시선: 마우스가 있으면 커서 쪽(머리의 화면 위치 기준, 정면 = 커서가 머리 위), 없으면 둘러봄 — 늦게 따라옴 */
+    let ty=.14*Math.sin(t*.29+1.3),tp=.05*Math.sin(t*.23);
+    if(ms){tf(rotOf(0,t,true),HEAD[0],HEAD[1],HEAD[2],FIT[0],V3);const x=V3[0],y=V3[1],z=V3[2],w=vp[3]*x+vp[7]*y+vp[11]*z+vp[15];
+      ty=Math.max(-.7,Math.min(.7,(mx-(vp[0]*x+vp[4]*y+vp[8]*z+vp[12])/w)*.6-bodyY(t,true)));tp=Math.max(-.2,Math.min(.28,((vp[1]*x+vp[5]*y+vp[9]*z+vp[13])/w-my)*.35))}
+    const q=1-Math.exp(-dt*2.4);gy+=(ty-gy)*q;gp+=(tp-gp)*q;
+  }
+  const ai=AI&&k===0&&u<.2&&!reduce;
+  if(ai){   /* 신경 신호: 누른 자리(.4초마다) · 커서가 지나간 드론(.9초마다)에서 생각 — 지난 프레임 드론 위치로 찾음(커서는 .15초마다만 — 드론 전부를 투영하므로) */
+    const hv=mv&&ms&&t-tq>.9&&t-tk>.15,sr=pd||hv?stage.getBoundingClientRect():null;
+    if(pd){const i=pick(pd[0]-sr.left,pd[1]-sr.top,36);if(i>=0&&t-tq>.4){AI.touch(i,t);tq=t}pd=null}
+    if(hv){tk=t;mv=false;const i=pick(cx0-sr.left,cy0-sr.top,14);if(i>=0){AI.touch(i,t);tq=t}}
+    AI.step(t);
+  }
   formPos(k,t,FA,FIT[k],true);if(u>0)formPos(k+1,t,FB,FIT[k+1],true);
-  const hw=TH*asp,sk=k*1013,W0=COL[0],FK=FIT[k],xw=FK.x1-FK.x0||1;
+  const hw=TH*asp,sk=k*1013,W0=COL[0],FK=FIT[k],xw=FK.x1-FK.x0||1,GL=ai?AI.glow:null;
   for(let i=0;i<NU;i++){
     const o=i*8,b=i*SW.ST,ph=i*4,j=((i+sk)%NU)*3;
     /* 흩어질 자리(카메라 기준 → 월드) — 전환마다 다른 자리 */
@@ -240,11 +274,20 @@ function frame(now){
     }
     /* 제자리 비행 흔들림 */
     if(!reduce){const am=.006*(1-Math.sin(Math.PI*e)*.5);x+=Math.sin(t*PH[ph+1]+PH[ph])*am;y+=Math.sin(t*PH[ph+1]*1.3+PH[ph+2])*am;z+=Math.sin(t*PH[ph+1]*.7+PH[ph]*1.7)*am}
-    buf[b]=x;buf[b+1]=y;buf[b+2]=z;buf[b+3]=SZ;buf[b+4]=ang;buf[b+5]=br;buf[b+6]=1;buf[b+7]=cr;buf[b+8]=cg;buf[b+9]=cb;
+    buf[b]=x;buf[b+1]=y;buf[b+2]=z;buf[b+3]=GL&&GL[i]>.003?SZ*(1+GL[i]*.9*(1-u*5)):SZ;   /* 신호 받은 드론은 잠깐 커짐 */buf[b+4]=ang;buf[b+5]=br;buf[b+6]=1;buf[b+7]=cr;buf[b+8]=cg;buf[b+9]=cb;
   }
-  R.draw(buf,NU,{vp,sh:[0,0],f:(cssH/2)/TH,dpr,frame:FRAME});
+  let nl=0;if(ai){const m=Math.max(0,1-u*6)*Math.min(1,Math.max(0,(intro-.75)/.25));if(m>0)nl=AI.lines(buf,SW.ST,FC,t,m,SEG)}   /* 흩어지기 시작하면 · 처음 모이는 중엔 선 없음 */
+  R.draw(buf,NU,{vp,sh:[0,0],f:(cssH/2)/TH,dpr,frame:FRAME,lw:.6*dpr+.5},SEG,nl);
   ui(t);
   return vis&&!document.hidden&&(!reduce||P!==PT);
+}
+
+/* 화면 점(무대 px)에서 r px 안 가장 가까운 흉상 드론 */
+function pick(px,py,r){
+  let b=-1,bd=r*r;
+  for(let i=0;i<NU;i++){if(!AI.ok(i))continue;const o=i*SW.ST,x=buf[o],y=buf[o+1],z=buf[o+2],w=vp[3]*x+vp[7]*y+vp[11]*z+vp[15];if(w<.1)continue;
+    const dx=((vp[0]*x+vp[4]*y+vp[8]*z+vp[12])/w*.5+.5)*cssW-px,dy=(.5-(vp[1]*x+vp[5]*y+vp[9]*z+vp[13])/w*.5)*cssH-py,d=dx*dx+dy*dy;if(d<bd){bd=d;b=i}}
+  return b;
 }
 
 /* ── 글 · 목차 · 기체 이름표 ── */
@@ -311,7 +354,9 @@ addEventListener('scroll',wake,{passive:true});
 document.addEventListener('visibilitychange',wake);
 new IntersectionObserver(es=>{vis=es.some(e=>e.isIntersecting);if(vis)wake()}).observe(stage);
 new ResizeObserver(()=>{measure();wake()}).observe(sec);
-addEventListener('pointermove',e=>{if(e.pointerType!=='mouse')return;mx=e.clientX/innerWidth*2-1;my=-(e.clientY/innerHeight*2-1);wake()},{passive:true});
+addEventListener('pointermove',e=>{if(e.pointerType!=='mouse')return;mx=e.clientX/innerWidth*2-1;my=-(e.clientY/innerHeight*2-1);ms=true;mv=true;cx0=e.clientX;cy0=e.clientY;wake()},{passive:true});
+stage.addEventListener('pointerdown',e=>{pd=[e.clientX,e.clientY];wake()},{passive:true});   /* 누르면(터치 포함) 그 자리 드론에서 생각 */
+document.documentElement.addEventListener('mouseleave',()=>{ms=false});   /* 창 밖 → 고개는 다시 둘러봄 */
 const go=i=>smoothTo(sec.getBoundingClientRect().top+scrollY+(i?U*(i+HOLD*.5):0),Math.min(2.4,.9+Math.abs(i-P)*.45));   /* 장 i가 머무는 가운데로 부드럽게(흩어졌다 모이는 모습이 보이게) */
 rb.forEach((b,i)=>b.addEventListener('click',()=>go(i)));
 sec.querySelectorAll('a[href="#swarm-uav"]').forEach(a=>a.addEventListener('click',e=>{if(e.button||e.metaKey||e.ctrlKey||e.shiftKey)return;e.preventDefault();e.stopPropagation();go(1)}));   /* site.js의 가렸다 옮기기 대신 */
@@ -324,6 +369,6 @@ sec.querySelectorAll('a[href="#swarm-uav"]').forEach(a=>a.addEventListener('clic
   const hide=()=>{const o=scrollY>40;if(o===cue.classList.contains('off'))return;cue.classList.toggle('off',o);clearTimeout(zt);if(o)zt=setTimeout(()=>{if(getComputedStyle(cue).opacity==='0')rest()},700);else cue.classList.remove('idle')};
   addEventListener('scroll',hide,{passive:true});hide()}
 SW.run=1;   /* 시작함 — 없으면 머리 인라인 스크립트가 DOMContentLoaded에 sw-on을 뗌(index*.html) */
-fetch('data/swarm.txt?v=3a40d855').then(r=>{if(!r.ok)throw new Error(r.status);return r.text()}).then(t=>{SH=parse(unb64(t));assign();fit();t0=0;wake()})
+fetch('data/swarm.txt?v=35ec5fe9').then(r=>{if(!r.ok)throw new Error(r.status);return r.text()}).then(t=>{SH=parse(unb64(t));assign();try{AI=SW.ai?SW.ai(SH[0].P,SH[0].T,NU):null}catch(e){console.warn('swarm-ai',e)}fit();t0=0;wake()})
   .catch(e=>{console.warn('swarm',e);root.classList.add('sw-nodata');CH.forEach((c,i)=>c.classList.toggle('on',i===0))});
 })();

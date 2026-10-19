@@ -1,6 +1,7 @@
 /* 메인 군집 드론 — 그리기(WebGL 점 스프라이트 · 없으면 2D 캔버스) · 행렬 도우미 → window.SW
    swarm.js가 씀(이 파일이 먼저). 드론 한 대 = 점 하나: 작으면 LED 점, 가까워져 커지면(13 → 26px) 쿼드콥터 모양이 드러남
-   버퍼(드론마다 10개): x y z(월드) · 크기(월드) · 방향(라디안) · 밝기 · 불투명 · r g b(0~1, 팔레트 색) */
+   버퍼(드론마다 10개): x y z(월드) · 크기(월드) · 방향(라디안) · 밝기 · 불투명 · r g b(0~1, 팔레트 색)
+   선분(AI 장 신경 신호, 선택): 선분마다 10개 — A xyz · B xyz · r g b · 불투명. 화면에서 굵기를 정한 사각형으로 그림 */
 (()=>{
 'use strict';
 const ST=10;
@@ -39,32 +40,54 @@ float a=mix(dt,max(fr,led),k);
 vec3 c=mix(vC*dt,uFr*fr*(1.-led)+vC*led,k);
 gl_FragColor=vec4(c,a)*vA;}`;
 
+/* 선분: 꼭짓점마다 A · B(월드) · t(0 A 끝 · 1 B 끝) · 옆(-1~1) · 색. 두 끝을 투영해 화면에서 수직으로 uW(px)만큼 벌림 */
+const LVS=`attribute vec3 aA,aB;attribute vec2 aT;attribute vec4 aC;
+uniform mat4 uVP;uniform vec2 uSh,uVw;uniform float uW;
+varying vec4 vC;varying float vS;
+void main(){vec4 a=uVP*vec4(aA,1.),b=uVP*vec4(aB,1.);a.xy+=uSh*a.w;b.xy+=uSh*b.w;
+vec2 d=b.xy/b.w*uVw-a.xy/a.w*uVw;float l=length(d);d=l>1e-3?d/l:vec2(1.,0.);
+vec4 q=mix(a,b,aT.x);q.xy+=vec2(-d.y,d.x)*aT.y*uW/uVw*q.w;gl_Position=q;vC=aC;vS=aT.y;}`;
+const LFS=`precision mediump float;varying vec4 vC;varying float vS;
+void main(){float e=smoothstep(1.,.25,abs(vS))*vC.a;gl_FragColor=vec4(vC.rgb*e,e*.75);}`;
+const LV=[[0,-1],[1,-1],[1,1],[0,-1],[1,1],[0,1]];   /* 선분 하나 = 삼각형 2개 */
+
 function makeGL(cv){
   const g=cv.getContext('webgl',{alpha:true,antialias:false,premultipliedAlpha:true,powerPreference:'high-performance'});
   if(!g)return null;
   const sh=(t,s)=>{const o=g.createShader(t);g.shaderSource(o,s);g.compileShader(o);if(!g.getShaderParameter(o,g.COMPILE_STATUS))throw new Error(g.getShaderInfoLog(o));return o};
-  let pr;
-  try{pr=g.createProgram();g.attachShader(pr,sh(g.VERTEX_SHADER,VS));g.attachShader(pr,sh(g.FRAGMENT_SHADER,FS));g.linkProgram(pr);if(!g.getProgramParameter(pr,g.LINK_STATUS))throw new Error(g.getProgramInfoLog(pr))}
+  /* 속성 자리는 두 프로그램이 0~3을 같이 씀 — 그릴 때마다 자기 버퍼로 다시 묶음 */
+  const prog=(v,f,names)=>{const p=g.createProgram();g.attachShader(p,sh(g.VERTEX_SHADER,v));g.attachShader(p,sh(g.FRAGMENT_SHADER,f));names.forEach((n,i)=>g.bindAttribLocation(p,i,n));g.linkProgram(p);if(!g.getProgramParameter(p,g.LINK_STATUS))throw new Error(g.getProgramInfoLog(p));return p};
+  let pr,lp;
+  try{pr=prog(VS,FS,['aP','aS','aC']);lp=prog(LVS,LFS,['aA','aB','aT','aC'])}
   catch(e){console.warn('swarm-gl',e);return null}
-  g.useProgram(pr);
   const U=n=>g.getUniformLocation(pr,n),uVP=U('uVP'),uSh=U('uSh'),uF=U('uF'),uDpr=U('uDpr'),uMax=U('uMax'),uFr=U('uFr');
-  const buf=g.createBuffer();g.bindBuffer(g.ARRAY_BUFFER,buf);
-  const at=(n,sz,off)=>{const l=g.getAttribLocation(pr,n);g.enableVertexAttribArray(l);g.vertexAttribPointer(l,sz,g.FLOAT,false,ST*4,off*4)};
-  at('aP',3,0);at('aS',4,3);at('aC',3,7);
+  const LU=n=>g.getUniformLocation(lp,n),lVP=LU('uVP'),lSh=LU('uSh'),lVw=LU('uVw'),lW=LU('uW');
+  const buf=g.createBuffer(),lbuf=g.createBuffer();
+  const at=(l,sz,st,off)=>{g.enableVertexAttribArray(l);g.vertexAttribPointer(l,sz,g.FLOAT,false,st*4,off*4)};
   g.enable(g.BLEND);g.blendFunc(g.ONE,g.ONE_MINUS_SRC_ALPHA);g.disable(g.DEPTH_TEST);
   const maxPt=Math.min(160,g.getParameter(g.ALIASED_POINT_SIZE_RANGE)[1]||64);
-  let cap=0,lost=false;
+  let cap=0,lcap=0,lv=null,lost=false,W=1,H=1;
   cv.addEventListener('webglcontextlost',e=>{e.preventDefault();lost=true});
   return {kind:'gl',
-    size(w,h){cv.width=w;cv.height=h;g.viewport(0,0,w,h)},
-    draw(data,n,cam){
+    size(w,h){cv.width=W=w;cv.height=H=h;g.viewport(0,0,w,h)},
+    draw(data,n,cam,L,nl){
       if(lost)return;
       g.clearColor(0,0,0,0);g.clear(g.COLOR_BUFFER_BIT);
+      g.useProgram(pr);g.bindBuffer(g.ARRAY_BUFFER,buf);
       if(n*ST>cap){cap=n*ST;g.bufferData(g.ARRAY_BUFFER,cap*4,g.DYNAMIC_DRAW)}
       g.bufferSubData(g.ARRAY_BUFFER,0,data.subarray(0,n*ST));
+      at(0,3,ST,0);at(1,4,ST,3);at(2,3,ST,7);
       g.uniformMatrix4fv(uVP,false,cam.vp);g.uniform2f(uSh,cam.sh[0],cam.sh[1]);
       g.uniform1f(uF,cam.f);g.uniform1f(uDpr,cam.dpr);g.uniform1f(uMax,maxPt);g.uniform3fv(uFr,cam.frame);
       g.drawArrays(g.POINTS,0,n);
+      if(!nl)return;
+      /* 선분 → 꼭짓점 6개씩(12칸: A3 B3 t2 색4) */
+      if(nl>lcap){lcap=Math.ceil(nl*1.5);lv=new Float32Array(lcap*72);g.bindBuffer(g.ARRAY_BUFFER,lbuf);g.bufferData(g.ARRAY_BUFFER,lv.byteLength,g.DYNAMIC_DRAW)}
+      for(let s=0,o=0;s<nl;s++){const b=s*10;for(let v=0;v<6;v++,o+=12){for(let k=0;k<6;k++)lv[o+k]=L[b+k];lv[o+6]=LV[v][0];lv[o+7]=LV[v][1];lv[o+8]=L[b+6];lv[o+9]=L[b+7];lv[o+10]=L[b+8];lv[o+11]=L[b+9]}}
+      g.useProgram(lp);g.bindBuffer(g.ARRAY_BUFFER,lbuf);g.bufferSubData(g.ARRAY_BUFFER,0,lv.subarray(0,nl*72));
+      at(0,3,12,0);at(1,3,12,3);at(2,2,12,6);at(3,4,12,8);
+      g.uniformMatrix4fv(lVP,false,cam.vp);g.uniform2f(lSh,cam.sh[0],cam.sh[1]);g.uniform2f(lVw,W/2,H/2);g.uniform1f(lW,cam.lw||1);
+      g.drawArrays(g.TRIANGLES,0,nl*6);
     }};
 }
 
@@ -73,7 +96,7 @@ function make2D(cv){
   const c=cv.getContext('2d');if(!c)return null;
   return {kind:'2d',
     size(w,h){cv.width=w;cv.height=h},
-    draw(d,n,cam){
+    draw(d,n,cam,L,nl){
       const W=cv.width,H=cv.height,m=cam.vp;c.clearRect(0,0,W,H);
       for(let i=0;i<n;i++){const o=i*ST,x=d[o],y=d[o+1],z=d[o+2];
         const w=m[3]*x+m[7]*y+m[11]*z+m[15];if(w<.12)continue;
@@ -82,6 +105,11 @@ function make2D(cv){
         c.globalAlpha=Math.min(1,a);c.fillStyle=`rgb(${d[o+7]*255|0},${d[o+8]*255|0},${d[o+9]*255|0})`;
         c.fillRect(sx*W-s/2,sy*H-s/2,s,s);
       }
+      if(nl){c.lineWidth=(cam.lw||1)*1.4;   /* 선분 */
+        const P=(x,y,z,o)=>{const w=m[3]*x+m[7]*y+m[11]*z+m[15];o[0]=((m[0]*x+m[4]*y+m[8]*z+m[12])/w+cam.sh[0])*.5*W+.5*W;o[1]=(.5-((m[1]*x+m[5]*y+m[9]*z+m[13])/w+cam.sh[1])*.5)*H;return w};
+        const a=[0,0],b=[0,0];
+        for(let s=0;s<nl;s++){const o=s*10;if(P(L[o],L[o+1],L[o+2],a)<.12||P(L[o+3],L[o+4],L[o+5],b)<.12)continue;
+          c.globalAlpha=Math.min(1,L[o+9]);c.strokeStyle=`rgb(${L[o+6]*255|0},${L[o+7]*255|0},${L[o+8]*255|0})`;c.beginPath();c.moveTo(a[0],a[1]);c.lineTo(b[0],b[1]);c.stroke()}}
       c.globalAlpha=1;
     }};
 }

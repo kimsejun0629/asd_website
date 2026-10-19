@@ -1,6 +1,6 @@
 # 메인 군집 드론 형상 — 점 구름 생성기 → web/data/swarm.txt (js/swarm.js가 읽음)
 # 사용: python3 tools/swarm/build.py [--preview 폴더]
-#  · 사람(AI) 흉상: assets/swarm/makehuman-base.obj(MakeHuman 기본 메시, CC0)의 어깨 위 표면을 넓이 비례로 뽑음(얼굴은 다듬어 표정 없앰)
+#  · 사람(AI) 흉상: assets/swarm/makehuman-base.obj(MakeHuman 기본 메시, CC0)의 어깨 위 표면을 넓이 비례로 뽑음(얼굴 앞은 높이 지도로 입 · 눈을 펴 표정 없앰)
 #    없으면 https://raw.githubusercontent.com/makehumancommunity/makehuman/master/makehuman/data/3dobjs/base.obj 를 받아 둠
 #  · 기체: 탑뷰 그림의 알파 → 평면형 + 동체 관 + 꼬리 기울기 · 수직꼬리날개. UH-60은 공개 제원으로 그린 평면형(로터는 따로)
 #  · 형상마다 점 수가 다르고 순서는 섞어 둠(앞부분만 써도 고르게 — 폰 · 편대의 같은 기종 여러 대)
@@ -16,7 +16,7 @@ from PIL import Image, ImageDraw
 ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / 'web/data/swarm.txt'
 REFS = ['web/index.html', 'web/index-en.html', 'web/js/swarm.js']   # 'data/swarm.txt?v=…'를 쓰는 곳
-RNG = np.random.default_rng(1977)
+RNG = np.random.default_rng(1977)   # main이 형상마다 다시 정함
 
 # 기체 설정 — x는 꼬리(0) → 기수(1) 비율, z · h는 그림 세로(날개폭) 비율
 #  body: 동체 반폭 상한 · tilt: 꼬리면 기울기 · lift: 높이 올림(T꼬리) · fins: 수직꼬리날개 다각형 [(x,h)…]
@@ -287,43 +287,81 @@ def build_bust(n):
             for k in range(1, len(idx) - 1):
                 F.append((idx[0], idx[k], idx[k + 1], g != 'body'))
     V, F = np.array(V), np.array(F)
-    # 표정 없애기: 얼굴 앞쪽 정점을 Taubin 방식으로 다듬어 입술 · 눈꺼풀 · 눈두덩 굴곡을 펴고(머리 모양은 유지) 눈알은 뺌
-    F = F[F[:, 3] == 0]
-    nb = [[] for _ in range(len(V))]
-    for t in F[:, :3]:
-        for i in range(3):
-            nb[t[i]] += [t[(i + 1) % 3], t[(i + 2) % 3]]
-    nb = [np.unique(x) for x in nb]
-    w = np.clip((V[:, 1] - 5.9) / .5, 0, 1) * np.clip((V[:, 2] - .1) / .5, 0, 1)
-    idx = np.nonzero(w > 0)[0]
-    for _ in range(30):
-        for lam in (.55, -.58):
-            avg = np.array([V[nb[i]].mean(0) if len(nb[i]) else V[i] for i in idx])
-            V[idx] += (avg - V[idx]) * lam * w[idx, None]
     a, b, c = V[F[:, 0]], V[F[:, 1]], V[F[:, 2]]
     cen = (a + b + c) / 3
     cr = np.cross(b - a, c - a)
-    nrm = cr / (np.linalg.norm(cr, axis=1, keepdims=True) + 1e-12)
-    keep = (cen[:, 1] > 3.6) & (np.abs(cen[:, 0]) < 2.9)          # 어깨 위(가슴 윗부분까지)
-    keep &= ~((cen[:, 1] > 6) & (cen[:, 2] > .4) & (nrm[:, 2] < -.2))   # 입 안 · 콧구멍 같은 안쪽 면(점이 비쳐 얼굴에 고리가 생김)
-    F, a, b, c, cen, cr, nrm = F[keep], a[keep], b[keep], c[keep], cen[keep], cr[keep], nrm[keep]
     ar = np.linalg.norm(cr, axis=1) / 2
+    nrm = cr / (2 * ar[:, None] + 1e-12)
+    # 표정 없애기: 얼굴 앞쪽은 메시 대신 높이 지도(앞에서 본 가장 앞 표면, 눈알 포함 — 입 안 · 눈구멍이 안 비침)에서 뽑고
+    #  입 · 눈 둘레만 흐리게 펴서 입술 · 눈꺼풀 굴곡을 없앰(코 · 턱 · 이마는 그대로). 메시를 다듬던 옛 방식은 입 안이 앞으로 부풀어 아래 끝이 웃는 입처럼 보였음
+    h, X0, Y0 = .0125, -1.25, 5.5
+    W, H = 200, 248                                           # x -1.25~1.25 · y 5.5~8.6
+    fr = (cen[:, 1] > 5.3) & (cen[:, 2] > -.2)
+    m = int(ar[fr].sum() / (h * h) * 6)                       # 칸마다 약 6점
+    ti = np.nonzero(fr)[0][RNG.choice(fr.sum(), m, p=ar[fr] / ar[fr].sum())]
+    u, v = RNG.random(m), RNG.random(m)
+    s = u + v > 1
+    u[s], v[s] = 1 - u[s], 1 - v[s]
+    Q = a[ti] + (b[ti] - a[ti]) * u[:, None] + (c[ti] - a[ti]) * v[:, None]
+    ix, iy = ((Q[:, 0] - X0) / h).astype(int), ((Q[:, 1] - Y0) / h).astype(int)
+    ok = (ix >= 0) & (ix < W) & (iy >= 0) & (iy < H)
+    Z = np.full((H, W), -9.0)
+    np.maximum.at(Z, (iy[ok], ix[ok]), Q[ok, 2])
+    for _ in range(3):                                        # 빈 칸은 이웃 값
+        Zp = np.pad(Z, 1, constant_values=-9)
+        Z = np.where(Z < -8, np.max([Zp[:-2, 1:-1], Zp[2:, 1:-1], Zp[1:-1, :-2], Zp[1:-1, 2:]], 0), Z)
+    gx, gy = X0 + (np.arange(W) + .5) * h, Y0 + (np.arange(H) + .5) * h
+    GX, GY = np.meshgrid(gx, gy)
+    ell = lambda cx, cy, rx, ry: np.clip(1.6 - 1.6 * np.hypot((GX - cx) / rx, (GY - cy) / ry), 0, 1)
+    M = np.maximum(ell(0, 6.6, .44, .25), np.maximum(ell(.31, 7.29, .24, .17), ell(-.31, 7.29, .24, .17)))   # 입 · 두 눈
+    M = M * M * (3 - 2 * M)
+    Zs = Z
+    for _ in range(4):
+        Zs = Z + (blur(Zs, 4) - Z) * M
+    Z = Zs
+    Zy, Zx = np.gradient(Z, h)
+    nz = 1 / np.sqrt(1 + Zx ** 2 + Zy ** 2)
+    R = (nz > .45) & (Z > -8) & (GY > 6) & (GY < 8.2)         # 높이 지도가 맡는 칸: 앞을 보는 얼굴
+    fi, fj = np.clip(((cen[:, 0] - X0) / h).astype(int), 0, W - 1), np.clip(((cen[:, 1] - Y0) / h).astype(int), 0, H - 1)
+    inR = R[fj, fi] & (cen[:, 2] > Z[fj, fi] - 1) & (np.abs(cen[:, 0]) < 1.25) & (cen[:, 1] > Y0)   # 그 자리 메시 면(입 안 · 콧구멍 포함)은 뺌
+    keep = (F[:, 3] == 0) & (cen[:, 1] > 3.6) & (np.abs(cen[:, 0]) < 2.9) & ~inR   # 어깨 위(가슴 윗부분까지)
+    hc = np.nonzero(R.ravel())[0]
+    hn = np.stack([-Zx.ravel()[hc], -Zy.ravel()[hc], np.ones(len(hc))], 1) * nz.ravel()[hc, None]
+    cen = np.concatenate([cen[keep], np.stack([GX.ravel()[hc], GY.ravel()[hc], Z.ravel()[hc]], 1)])
+    nrm = np.concatenate([nrm[keep], hn])
+    ar = np.concatenate([ar[keep], h * h / nz.ravel()[hc]])
     # 밀도: 얼굴 쪽 진하게, 잘린 아래 끝은 옅어지며 흩어짐
     dens = np.interp(cen[:, 1], [3.6, 4.5, 5.2, 8.5], [.15, .8, 1, 1])
     dens = np.where((cen[:, 1] > 6) & (nrm[:, 2] < -.3), dens * .5, dens)   # 뒤통수는 옅게(얼굴이 덜 가려지게)
-    dens = np.where((cen[:, 1] > 5.5) & (cen[:, 1] < 7.2) & (nrm[:, 1] < -.35), dens * .3, dens)   # 턱 아랫면(정면에서 입 둘레 고리처럼 비침)
-    ti = RNG.choice(len(F), n, p=(ar * dens) / (ar * dens).sum())
-    u, v = RNG.random(n), RNG.random(n)
+    dens = np.where((cen[:, 1] > 5.5) & (cen[:, 1] < 7.2) & (nrm[:, 1] < -.35), dens * .3, dens)   # 턱 아랫면(정면에서 턱 둘레 고리처럼 비침)
+    pk = RNG.choice(len(cen), n, p=(ar * dens) / (ar * dens).sum())
+    nm = keep.sum()
+    isM = pk < nm
+    P, Nn = np.zeros((n, 3)), nrm[pk]
+    tm = np.nonzero(keep)[0][pk[isM]]                          # 메시 면: 삼각형 안 무작위
+    u, v = RNG.random(len(tm)), RNG.random(len(tm))
     s = u + v > 1
     u[s], v[s] = 1 - u[s], 1 - v[s]
-    P = a[ti] + (b[ti] - a[ti]) * u[:, None] + (c[ti] - a[ti]) * v[:, None]
-    Nn = nrm[ti]
+    P[isM] = a[tm] + (b[tm] - a[tm]) * u[:, None] + (c[tm] - a[tm]) * v[:, None]
+    k = hc[pk[~isM] - nm]                                      # 높이 지도 칸: 칸 안 무작위, 기울기로 z
+    kj, ki = k // W, k % W
+    fx, fy = RNG.random(len(k)) - .5, RNG.random(len(k)) - .5
+    P[~isM] = np.stack([gx[ki] + fx * h, gy[kj] + fy * h, Z[kj, ki] + (Zx[kj, ki] * fx + Zy[kj, ki] * fy) * h], 1)
     k = RNG.random(n) < .05                       # 먼지: 5%는 표면에서 조금 떠 있음
     P[k] += Nn[k] * RNG.random((k.sum(), 1)) * .35
     low = P[:, 1] < 4.3                            # 잘린 끝 아래로 조금 흘러내림
     P[low, 1] -= RNG.random(low.sum()) ** 2 * .6
     T = np.where(k, .55, .92).astype(np.float32)
     return finish(P.astype(np.float32), Nn.astype(np.float32), T, np.zeros(n, np.uint8))
+
+
+def blur(A, s):
+    # 분리 가우스(s 화소, 가장자리는 늘임)
+    r = int(3 * s)
+    k = np.exp(-np.arange(-r, r + 1) ** 2 / (2 * s * s))
+    A = np.pad(A, r, mode='edge')
+    A = np.apply_along_axis(lambda x: np.convolve(x, k / k.sum(), 'valid'), 0, A)
+    return np.apply_along_axis(lambda x: np.convolve(x, k / k.sum(), 'valid'), 1, A)
 
 
 def finish(P, Nn, T, col):
@@ -372,8 +410,10 @@ def preview(shapes, folder):
 
 def main():
     args = sys.argv[1:]
+    global RNG
     shapes = []
-    for cfg in SHAPES:
+    for i, cfg in enumerate(SHAPES):
+        RNG = np.random.default_rng([1977, i])   # 형상마다 시드 — 한 형상을 고쳐도 다른 형상의 점은 그대로
         shapes.append(build_bust(cfg['n']) if cfg['id'] == 'ai' else build_plan(cfg))
         print(cfg['id'], cfg['n'])
     data = pack(shapes)
