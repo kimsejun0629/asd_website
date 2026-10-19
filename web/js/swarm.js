@@ -62,7 +62,7 @@ for(let i=0;i<NU;i++){
 let SH=null;   /* 형상: {P,N,T,C,n,hx,hz 로터 중심,y0 아래 끝} */
 const MI=CFG.map(()=>new Uint8Array(NU)),LI=CFG.map(()=>new Uint16Array(NU));   /* 장마다 드론 → 기체 · 그 형상의 점 번호 */
 const CNT=CFG.map(c=>c.m.map(()=>0));
-const buf=new Float32Array(NU*SW.ST);
+const GX=2100,buf=new Float32Array((NU+GX)*SW.ST);   /* 뒤 GX칸: AI 장 생각의 형상(swarm-ai.js glyphs) */
 
 /* ── 행렬 ── */
 const rx=a=>{const c=Math.cos(a),s=Math.sin(a);return [1,0,0, 0,c,s, 0,-s,c]};       /* 열 우선 3×3 */
@@ -80,7 +80,7 @@ const tf=(G,x,y,z,F,o)=>{o[0]=(G[0]*x+G[3]*y+G[6]*z)*F.s+F.x;o[1]=(G[1]*x+G[4]*y
 const FIT=CFG.map(()=>({s:1,x:0,y:0,x0:-1,x1:1})),V3=[0,0,0,0],HR=new Float32Array(256*4);   /* HR: 고개 회전표(몫 단계마다 cos · sin) */
 function formPos(k,t,out,F,idle){
   const c=CFG[k],G=rotOf(k,t,idle),mi=MI[k],li=LI[k],w=idle&&!reduce,cnt=CNT[k];
-  const rot=w?t*2.6:0,hm=c.human&&w,GW=hm&&AI?AI.glow:null;
+  const rot=w?t*2.6:0,hm=c.human&&w,GW=hm&&AI?AI.glow:null,DM=GW?AI.dim:null;
   if(hm)for(let s=0;s<256;s++){const p=gp*s/255,y=gy*s/255;HR[s*4]=Math.cos(p);HR[s*4+1]=Math.sin(p);HR[s*4+2]=Math.cos(y);HR[s*4+3]=Math.sin(y)}
   const L=c.m.map((m,q)=>{   /* 기체마다: 편대 회전 × 자기 틀기, 위치(위아래 흔들림) */
     if(m.fx)return null;
@@ -106,7 +106,7 @@ function formPos(k,t,out,F,idle){
     }
     a*=e.sc;b*=e.sc;d*=e.sc;
     out[o]=(M[0]*a+M[3]*b+M[6]*d+e.o[0])*F.s+F.x;out[o+1]=(M[1]*a+M[4]*b+M[7]*d+e.o[1])*F.s+F.y;out[o+2]=(M[2]*a+M[5]*b+M[8]*d+e.o[2])*F.s;
-    if(c.human){const fz=M[2]*n0+M[5]*n1+M[8]*n2,rim=1-Math.abs(fz),up=M[1]*n0+M[4]*n1+M[7]*n2;FC[i]=fz;br=sh.T[j]*(.58+.5*rim*rim)*(.82+.28*up)+g*.9}   /* 가장자리 빛 × 위에서 오는 빛 + 신호. FC: 카메라 쪽을 보는 정도(뒤쪽 신호 선은 흐리게) */
+    if(c.human){const fz=M[2]*n0+M[5]*n1+M[8]*n2,rim=1-Math.abs(fz),up=M[1]*n0+M[4]*n1+M[7]*n2;FC[i]=fz;br=(sh.T[j]*(.58+.5*rim*rim)*(.82+.28*up)+g*.9)*(DM?1-DM[i]:1)}   /* 가장자리 빛 × 위에서 오는 빛 + 신호. FC: 카메라 쪽을 보는 정도(뒤쪽 신호 선은 흐리게) */
     else br=sh.T[j]*(.86+.14*(M[1]*n0+M[4]*n1+M[7]*n2));
     out[o+3]=Math.min(1,cl===1?br+.2:cl===2?br+.15:br);
     const cc=COL[cl];out[o+7]=e.ang;
@@ -276,8 +276,8 @@ function frame(now){
     if(!reduce){const am=.006*(1-Math.sin(Math.PI*e)*.5);x+=Math.sin(t*PH[ph+1]+PH[ph])*am;y+=Math.sin(t*PH[ph+1]*1.3+PH[ph+2])*am;z+=Math.sin(t*PH[ph+1]*.7+PH[ph]*1.7)*am}
     buf[b]=x;buf[b+1]=y;buf[b+2]=z;buf[b+3]=GL&&GL[i]>.003?SZ*(1+GL[i]*.9*(1-u*5)):SZ;   /* 신호 받은 드론은 잠깐 커짐 */buf[b+4]=ang;buf[b+5]=br;buf[b+6]=1;buf[b+7]=cr;buf[b+8]=cg;buf[b+9]=cb;
   }
-  let nl=0;if(ai){const m=Math.max(0,1-u*6)*Math.min(1,Math.max(0,(intro-.75)/.25));if(m>0)nl=AI.lines(buf,SW.ST,FC,t,m,SEG)}   /* 흩어지기 시작하면 · 처음 모이는 중엔 선 없음 */
-  R.draw(buf,NU,{vp,sh:[0,0],f:(cssH/2)/TH,dpr,frame:FRAME,lw:.6*dpr+.5},SEG,nl);
+  let nl=0,ng=0;if(ai){const m=Math.max(0,1-u*6)*Math.min(1,Math.max(0,(intro-.75)/.25));if(m>0){nl=AI.lines(buf,SW.ST,FC,t,m,SEG);ng=AI.glyphs(t,buf,NU,GX,SW.ST,m,FIT[0].s,SZ)}}   /* 흩어지기 시작하면 · 처음 모이는 중엔 선 · 기체 없음 */
+  R.draw(buf,NU+ng,{vp,sh:[0,0],f:(cssH/2)/TH,dpr,frame:FRAME,lw:.6*dpr+.5},SEG,nl);
   ui(t);
   return vis&&!document.hidden&&(!reduce||P!==PT);
 }
@@ -369,6 +369,6 @@ sec.querySelectorAll('a[href="#swarm-uav"]').forEach(a=>a.addEventListener('clic
   const hide=()=>{const o=scrollY>40;if(o===cue.classList.contains('off'))return;cue.classList.toggle('off',o);clearTimeout(zt);if(o)zt=setTimeout(()=>{if(getComputedStyle(cue).opacity==='0')rest()},700);else cue.classList.remove('idle')};
   addEventListener('scroll',hide,{passive:true});hide()}
 SW.run=1;   /* 시작함 — 없으면 머리 인라인 스크립트가 DOMContentLoaded에 sw-on을 뗌(index*.html) */
-fetch('data/swarm.txt?v=35ec5fe9').then(r=>{if(!r.ok)throw new Error(r.status);return r.text()}).then(t=>{SH=parse(unb64(t));assign();try{AI=SW.ai?SW.ai(SH[0].P,SH[0].T,NU):null}catch(e){console.warn('swarm-ai',e)}fit();t0=0;wake()})
+fetch('data/swarm.txt?v=35ec5fe9').then(r=>{if(!r.ok)throw new Error(r.status);return r.text()}).then(t=>{SH=parse(unb64(t));assign();try{AI=SW.ai?SW.ai(SH,NU):null}catch(e){console.warn('swarm-ai',e)}fit();t0=0;wake()})
   .catch(e=>{console.warn('swarm',e);root.classList.add('sw-nodata');CH.forEach((c,i)=>c.classList.toggle('on',i===0))});
 })();

@@ -3,7 +3,7 @@
 `web/`을 claude.ai 아티팩트로 올리거나 게시본과 맞출 때 읽는다. 검사 방법은 verify.md, 도구 목록은 tools.md.
 
 - 게시 주소: https://claude.ai/artifact/8PVpxzCfkjLGqoRoqLs2tV — **여러 세션이 게시한다. 게시본이 기준이다.**
-- 2026-10-19 게시: v62(id `1792377467-5df7`, 284개) = `web/` = `_archive/live-v62/` — 흉상 입 모양 · 시선 · 신경 신호. v61(`1792333761-c311`) = `_archive/live-v61/` — 리팩터(§5) · 군집 드론 메인 · 글꼴 k2. v60(`1790421930-d731`) = `_archive/pre-refactor-v60/`. 스냅숏의 `video/`는 `web/video` 링크. 게시 전 1절을 반드시 수행한다.
+- 2026-10-20 게시: v63(id `1792423318-2830`, 284개) = `web/` = `_archive/live-v63/` — 신경 신호 속 기체 여러 대. v62(`1792377467-5df7`) · v61(`1792333761-c311`, 리팩터 §5) = `_archive/live-v62/` · `live-v61/`. v60(`1790421930-d731`) = `_archive/pre-refactor-v60/`. 스냅숏의 `video/`는 `web/video` 링크. 게시 전 1절을 반드시 수행한다.
 
 ## 1. 고치기 전: 게시본과 맞추기
 
@@ -57,10 +57,10 @@
   - `mro*.html`(빈 `<path class="land">`) ↔ `js/mro.js`(fetch로 채움) ↔ `img/mro-land.svg` · `css/mro.css`
   - 각 쪽 HTML ↔ 그 쪽 `css/<쪽>.css` · `js/<쪽>.js`
 - **2026-10-18 메인 군집 드론(swarm.md):** 새 `js/swarm-gl.js` · `js/swarm.js` · `data/swarm.txt`, 바뀐 `index*.html` · `css/index.css` · `js/index.js` · `js/scroll-fx.js`. 글꼴 k2 · 자폭 탑뷰 `_top3`. 옛 메인 영상 `video/hero2-*`는 안 씀.
-- 목록 다시 뽑기(루트). 다음 게시는 v62 기준(`--baseline`), 기본값은 v60:
+- 목록 다시 뽑기(루트). 다음 게시는 v63 기준(`--baseline`), 기본값은 v60:
 
 ```sh
-python3 tools/verify/manifest.py --baseline _archive/live-v62 --output _verification/refactor/stage-d/publish-manifest.json
+python3 tools/verify/manifest.py --baseline _archive/live-v63 --output _verification/refactor/stage-d/publish-manifest.json
 ```
 
 SHA-256 · 추가/변경/삭제 · 전송량이 기록된다. 라이브가 바뀌었으면 `--baseline`에 동기화한 기준본을 지정한다. Stage C의 41개 목록은 사용하지 않는다.

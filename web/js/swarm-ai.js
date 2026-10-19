@@ -4,7 +4,9 @@
    다 퍼지면 '깨달음': 그 생각이 지나간 길 전체가 한꺼번에 다시 빛났다 사라짐(연결망이 한 장의 지도로 읽히게)
    생각: 처음 모인 직후 이마에서 · 그 뒤 5.5~7.5초마다 머리 위쪽 아무 곳에서 · 커서가 닿거나 누른 드론에서(swarm.js가 think)
    쉴 때도 짧은 불꽃(2~6번 건넘)이 드문드문 — 연결망이 늘 살아 있게
-   swarm.js가 씀: step(t) → glow[i](0~1) · lines(...)(선분 수). 순서: swarm-gl → 이 파일 → swarm */
+   생각의 형상: 깨달음마다 그 길 위 앞을 보는 드론들 곁에 작은 기체 여러 대(3~5대 · 폰 2~3대, 기종은 7종에서 무작위로 겹치지 않게)가 엇갈려 지지직 나타났다 사라짐
+   (기체 점 구름 = swarm.txt 형상 1~7의 앞 점들, 금색 점 · 화면을 보는 윗면도 · 조금 날아감). 들고 날 때 가로 띠가 어긋나는 글리치, 뒤 흉상 드론은 둥글게 흐려짐
+   swarm.js가 씀: step(t) → glow[i](0~1) · lines(...)(선분 수) · glyphs(...)(점 수). 순서: swarm-gl → 이 파일 → swarm */
 (()=>{
 'use strict';
 const SW=window.SW;
@@ -13,9 +15,12 @@ const K=8,CELL=.05,RMAX=.1;   /* 이웃 수 · 격자 칸 · 이웃 최대 거�
 const V=1.15,LIFE=1.5,SYNC=1.9;   /* 신호 속도(흉상 좌표/초) · 지나간 선이 사라지는 시간 · 깨달음 빛 길이 */
 const T0=2.2;   /* 첫 생각(처음 모인 직후) */
 const GOLD=[194,166,115].map(v=>v/255),CREAM=[192,183,171].map(v=>v/255);
+const PLAT=[1,2,3,4,5,6,7],GD=1.9,GS=.12,GR=.2,GSZ={4:.85,5:1.15};   /* 생각의 형상: 기체 7종(중고도 · 스텔스 · 저피탐 · 자폭 · 787 · UH-60 · 전자전기) · 보이는 시간 · 크기(흉상 좌표, 반 길이) · 뒤 드론을 흐리게 할 반경 · 기종별 크기 배율 */
+const hh=i=>{const x=Math.sin(i*127.1+311.7)*43758.5453;return x-Math.floor(x)};
 
-/* P: 흉상 점(xyz) · T: 밝기(먼지 < .6) · n: 드론 수(앞 n점 = 드론 i) */
-function make(P,T,n){
+/* SH: 형상들(0 흉상 — P 점 · N 법선 · T 밝기(먼지 < .6), 1~7 기체) · n: 드론 수(흉상 앞 n점 = 드론 i) */
+function make(SH,n){
+  const P=SH[0].P,T=SH[0].T,NN=SH[0].N;
   const ok=new Uint8Array(n),NB=new Int32Array(n*K).fill(-1);
   for(let i=0;i<n;i++)ok[i]=T[i]>.6&&P[i*3+1]>-.72?1:0;   /* 먼지 · 흘러내린 아래 끝은 빼고 */
   /* 연결망: 격자로 가까운 점을 찾아 가까운 순 K개 */
@@ -61,7 +66,7 @@ function make(P,T,n){
         hop(e.i,e.dx+rx*2.2,e.dy+ry*2.2,e.dz+rz*2.2,Math.min(e.life-1,5+Math.random()*14|0),e.w*.8,e.c,e.o,e.t1);
       }
     }
-    if(CN[k]<=0&&CB[k])CE[k]=e.t1+.12;   /* 마지막 신호가 닿음 → 깨달음 */
+    if(CN[k]<=0&&CB[k]){CE[k]=e.t1+.12;idea(e.c,CE[k])}   /* 마지막 신호가 닿음 → 깨달음 · 생각의 형상 */
   }
   /* 생각 하나: o에서 줄기 tr개(방향은 고르게 흩음) */
   function think(o,t,tr,life,w,big,gv){
@@ -70,11 +75,29 @@ function make(P,T,n){
     const a0=Math.random()*6.283;
     for(let k=0;k<tr;k++){const a=a0+k/tr*6.283,u=Math.random()*2-1;hop(o,Math.cos(a),u,Math.sin(a),life*(.7+Math.random()*.5)|0,w,c,o,t)}
   }
+  /* 생각의 형상 자리: 첫 대는 이 생각이 지나간 드론, 나머지는 흉상 앞(머리 · 목 · 가슴)을 보는 드론 아무 곳 — 서로 떨어지게 */
+  let IDS=[];const CAND=new Int32Array(n),dim=new Float32Array(n),BS=new Float32Array(8);   /* IDS: 떠 있는 기체들 · dim: 뒤 드론 흐림(0~1) · BS: 글리치 띠 어긋남 */
+  function idea(c,t0){
+    const big=n>4000,want=Math.min((big?7:4)-IDS.length,big?3+Math.random()*3|0:2+Math.random()*2|0);   /* 한 번에 3~5대(폰 2~3), 동시에 7대(폰 4)까지 */
+    if(want<=0)return;
+    let m=0,m0=0;
+    for(let i=0;i<n;i++)if(ok[i]&&P[i*3+1]>-.5&&P[i*3+1]<.8&&NN[i*3+2]>.45){if(SEEN[i]===c){CAND[m++]=CAND[m0];CAND[m0++]=i}else CAND[m++]=i}   /* 앞 m0개 = 이 생각의 길 */
+    if(!m)return;
+    const L=PLAT.filter(s=>SH[s]);for(let i=L.length-1;i>0;i--){const j=Math.random()*(i+1)|0,v=L[i];L[i]=L[j];L[j]=v}   /* 기종: 겹치지 않게 섞음 */
+    const far=i=>IDS.every(g=>Math.hypot(P[i*3]-P[g.a*3],P[i*3+1]-P[g.a*3+1],P[i*3+2]-P[g.a*3+2])>.34);
+    for(let k=0;k<want&&k<L.length;k++){
+      let a=-1;for(let r=0;r<40&&a<0;r++){const i=CAND[Math.random()*(k||!m0?m:m0)|0];if(far(i))a=i}
+      if(a<0)break;
+      const s=L[k],sd=Math.random()<.5?1:-1,gs=GS*(GSZ[s]||1)*(.9+Math.random()*.2),R=GR*gs/GS,ax=P[a*3],ay=P[a*3+1],az=P[a*3+2],near=[];
+      for(let i=0;i<n;i++){const d=Math.hypot(P[i*3]-ax,P[i*3+1]-ay,P[i*3+2]-az);if(d<R)near.push(i,1-d/R)}
+      IDS.push({s,a,gs,near,t0:t0+k*.12+Math.random()*.25,h:(sd>0?0:Math.PI)+sd*(.1+Math.random()*.35),b:sd*(.1+Math.random()*.15)});   /* 조금씩 엇갈려 나타남 */
+    }
+  }
   const pickOk=f=>{for(let k=0;k<40;k++){const i=Math.random()*n|0;if(ok[i]&&f(i))return i}return -1};
   const nearest=(x,y,z)=>{let b=-1,bd2=1e9;for(let i=0;i<n;i++){if(!ok[i])continue;const d=(P[i*3]-x)**2+(P[i*3+1]-y)**2+(P[i*3+2]-z)**2;if(d<bd2){bd2=d;b=i}}return b};
 
   return {
-    glow,
+    glow,dim,
     ok:i=>ok[i]===1,
     /* 커서 · 누름: 그 드론에서 생각 — 다음 저절로 생각은 미룸 */
     touch(i,t){think(i,t,4,50,1,1,.1);nAuto=Math.max(nAuto,t+4.5)},
@@ -89,6 +112,41 @@ function make(P,T,n){
         if(a>6){IN[i]=0;glow[i]=SY[i]=0;continue}
         AL[m++]=i;SY[i]=sync(i);glow[i]=Math.max(a>2?0:FW[i]*(.85*Math.exp(-a*7)+.3*Math.exp(-a*1.8)),SY[i]*.7)}   /* 번쩍 → 은은한 잔광 · 깨달음 */
       na=m;
+    },
+    /* 생각의 형상 → buf의 base번째 칸부터 점(최대 cap)을 써 넣고 점 수를 돌려줌. ws: 흉상 좌표 → 월드 배율 · sz: 드론 크기 · m: 세기
+       점마다 나타나는 때(앞 .35초)와 사라지는 때(끝 .4초)가 다르고, 그 앞뒤 .12초는 깜빡이며 흔들림(지지직) — 나타난 뒤 흔들림은 곧 잦아듦 */
+    glyphs(t,buf,base,cap,ST,m,ws,sz){
+      if(!IDS.length)return 0;
+      for(const g of IDS)for(let q=0;q<g.near.length;q+=2)dim[g.near[q]]=0;
+      IDS=IDS.filter(g=>t-g.t0<=GD+.15);
+      const G0=n>4000?300:180;let k=0;
+      for(const g of IDS){
+        const a=t-g.t0;if(a<0)continue;
+        const nr=g.near,fd=Math.max(0,Math.min(1,a/.3,(GD+.15-a)/.4));
+        for(let q=0;q<nr.length;q+=2){const v=fd*Math.min(1,nr[q+1]*1.6)*.8;if(v>dim[nr[q]])dim[nr[q]]=v}   /* 뒤 흉상 드론 흐림(겹치면 큰 쪽) */
+        /* 글리치: 들어올 때 · 나갈 때 · 중간에 한 번, 가로 띠(8개)가 기수 방향으로 제멋대로 어긋남 */
+        const ga=a<.45?.4*(1-a/.45)**2:a>GD-.45?.4*((a-GD+.45)/.45)**2:a>.95&&a<1.04?.16:0;
+        for(let q=0;q<8;q++)BS[q]=ga&&Math.random()<.5?(Math.random()-.5)*ga*2:0;
+        const sh=SH[g.s],G=Math.min(sh.n,G0),ab=g.a*ST,sc=g.gs*ws,ch=Math.cos(g.h),sn=Math.sin(g.h),cb=Math.cos(g.b),sb=Math.sin(g.b),rt=t*9;
+        const ox=buf[ab]+ch*a*.05*ws,oy=buf[ab+1]+sn*a*.05*ws,oz=buf[ab+2]+.06*ws;   /* 자리: 그 드론 조금 앞 · 기수 쪽으로 천천히 */
+        for(let j=0;j<G;j++){
+          const ta=.35*hh(j+g.s*131),td=GD-.4*hh(j+977+g.s*131);
+          let nz=0,on=1,fl=0;
+          if(a<ta){if(a<ta-.12||Math.random()<.55)continue;nz=1;on=.5}   /* 들어오기 전: 깜빡이며 흔들림 */
+          else if(a>td){if(a>td+.12||Math.random()<(a-td)/.12)continue;nz=1+(a-td)*8;on=.6}   /* 나가며: 깜빡이다 흩어짐 */
+          else{nz=Math.exp(-(a-ta)*14);fl=Math.exp(-(a-ta)*9)}   /* 막 나타남: 번쩍 · 흔들림이 잦아듦 */
+          let x=sh.P[j*3],y=sh.P[j*3+1],z=sh.P[j*3+2];
+          if(sh.C[j]===3){const c=Math.cos(rt),s2=Math.sin(rt),u=x-sh.hx,w=z-sh.hz;x=sh.hx+u*c-w*s2;z=sh.hz+u*s2+w*c}   /* 로터 회전 */
+          if(nz>.01){x+=(Math.random()-.5)*.18*nz;y+=(Math.random()-.5)*.18*nz;z+=(Math.random()-.5)*.18*nz}
+          /* 윗면도를 화면 쪽으로: x 기수 → 화면 가로, z 오른날개 → 화면 아래, y 위 → 카메라 쪽. 기수 축으로 b만큼 기울이고 화면에서 h만큼 돌림 */
+          const vy=-z*cb-y*sb,vz=-z*sb+y*cb,gx=x+BS[Math.min(7,Math.max(0,(vy+1)*4|0))],X=gx*ch-vy*sn,Y=gx*sn+vy*ch;
+          const o=(base+k)*ST;
+          buf[o]=ox+X*sc;buf[o+1]=oy+Y*sc;buf[o+2]=oz+vz*sc;buf[o+3]=sz*(.6+fl*.5);buf[o+4]=g.h;buf[o+5]=Math.min(1,(.55+.4*sh.T[j])*on+fl*.5);buf[o+6]=m;
+          buf[o+7]=GOLD[0]+(CREAM[0]-GOLD[0])*fl;buf[o+8]=GOLD[1]+(CREAM[1]-GOLD[1])*fl;buf[o+9]=GOLD[2]+(CREAM[2]-GOLD[2])*fl;
+          if(++k>=cap)return k;
+        }
+      }
+      return k;
     },
     /* 선분(드론 위치 buf, 칸 ST · 마주 보는 정도 fc · 세기 m) → out에 [ax ay az bx by bz r g b a] × 수, 수를 돌려줌 */
     lines(buf,ST,fc,t,m,out){
