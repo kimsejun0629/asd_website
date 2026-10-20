@@ -86,3 +86,4 @@ cstyle은 두 변경을 모두 잡고(`s:color,… rgb(161,154,145) → (161,154
 
 - 부하가 크면 연혁 가로 무대(`.hx`)의 카드 루프가 초당 1프레임도 못 돌아 수렴하지 못하고(`unsettled`), 3D 페이지 열기가 2분을 넘기기도 한다. summary에 `settle-timeouts` · `unsettled` · `errors`가 0이 아니면 그 차이는 믿지 말고, 한가할 때 · `WORKERS`를 줄여 그 페이지만 다시 돌린다.
 - 덤프 크기: cstyle 한 벌(34화면 × 3상태) gzip 약 4~5MB.
+- 2026-10-20 Chrome(Playwright)에서는 company · company-en이 열리지 않는다(기준 · 후보 모두 `goto` 시간 초과). 음성 트랙(AAC)이 있는 `video/co-ci-*.mp4`가 자동화 Chrome에서 첫 프레임을 내지 못해(readyState 1) `load`가 오지 않기 때문이다. 실제 Chrome에서는 0.7초에 `load`. 사이트 탓이 아니므로 그 두 쪽은 `domcontentloaded`로 열거나 사람이 확인한다.

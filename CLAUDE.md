@@ -2,7 +2,7 @@
 
 Korean Air Aerospace 사이트 리디자인. 결과물은 claude.ai 아티팩트로 게시한다.
 
-- 게시 주소: https://claude.ai/artifact/8PVpxzCfkjLGqoRoqLs2tV — v63(2026-10-20) = `web/`. 목록 · 라이브 확인: `docs/publish.md`.
+- 게시 주소: https://claude.ai/artifact/8PVpxzCfkjLGqoRoqLs2tV — v64(2026-10-20) = `web/`. 목록 · 라이브 확인: `docs/publish.md`.
 - 사용자와는 한국어로. 모든 쪽은 국문 · 영문 한 쌍(`x.html` ↔ `x-en.html`, 7쌍 14쪽).
 - 자세한 것은 필요할 때 `docs/`(아래 표). 옛 원문: `_archive/claude-md-v60.md`.
 
