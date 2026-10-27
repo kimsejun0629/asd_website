@@ -14,3 +14,6 @@ tools/_legacy/
 Adobe Premiere Pro*/
 *.prproj
 .DS_Store
+
+# 내려받은 모델(프로젝트 밖 자료)
+ltx-*/

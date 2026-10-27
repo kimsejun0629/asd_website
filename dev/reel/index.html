@@ -1,0 +1,9 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Hero reel</title>
+<style>html,body{margin:0;background:#111;overflow:hidden}#out{display:block;width:1920px;height:1080px}#hud{position:fixed;right:8px;bottom:6px;font:12px monospace;color:#888;pointer-events:none}body.cap #hud{display:none}</style>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.min.js"}}</script>
+</head><body>
+<canvas id="out" width="1920" height="1080"></canvas><div id="hud"></div>
+<script>if(new URLSearchParams(location.search).get('cap'))document.body.classList.add('cap')</script>
+<script type="module" src="main.js"></script>
+</body></html>

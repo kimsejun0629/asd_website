@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>사이트 편집 모드</title>
+<!-- 개발 페이지(게시 안 함): web/ 쪽을 iframe으로 띄워 요소를 옮기고 크기를 바꾼 뒤 내보낸다. 사용법은 dev/edit.md -->
+<style>
+:root{--bg:#1b1d1f;--pn:#25282a;--ln:#3a3d41;--tx:#e8e4de;--mu:#a19a91;--ac:#c2a673;--hv:#53aae2}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--tx);font:12px/1.5 -apple-system,system-ui,sans-serif}
+body{display:flex}
+#stage{position:relative;flex:1;overflow:hidden;background:#111}
+#fr{position:absolute;left:0;top:0;border:0;transform-origin:0 0;background:#fff}
+#layer{position:absolute;left:0;top:0;pointer-events:none;overflow:hidden}
+.box{position:absolute;left:0;top:0;pointer-events:none}
+#hov{outline:1px dashed var(--hv);background:rgba(83,170,226,.08)}
+#sel{outline:1.5px solid var(--ac)}
+body.on #sel{pointer-events:auto;cursor:move}
+.tag{position:absolute;left:0;bottom:100%;margin-bottom:2px;padding:1px 5px;white-space:nowrap;font-size:11px;background:var(--hv);color:#051766;border-radius:2px}
+#sel .tag{background:var(--ac);color:#25282a}
+.box.low .tag{bottom:auto;top:100%;margin:2px 0 0}
+.h{position:absolute;width:9px;height:9px;margin:-5px 0 0 -5px;background:#fff;border:1.5px solid var(--ac);display:none}
+body.on .h{display:block}
+.h[data-d="nw"]{left:0;top:0;cursor:nwse-resize}.h[data-d="n"]{left:50%;top:0;cursor:ns-resize}.h[data-d="ne"]{left:100%;top:0;cursor:nesw-resize}
+.h[data-d="w"]{left:0;top:50%;cursor:ew-resize}.h[data-d="e"]{left:100%;top:50%;cursor:ew-resize}
+.h[data-d="sw"]{left:0;top:100%;cursor:nesw-resize}.h[data-d="s"]{left:50%;top:100%;cursor:ns-resize}.h[data-d="se"]{left:100%;top:100%;cursor:nwse-resize}
+#shield{position:fixed;inset:0;z-index:9;display:none}
+#pn{width:300px;flex:none;overflow:auto;background:var(--pn);border-left:1px solid var(--ln);padding:12px 14px 40px}
+h2{margin:16px 0 6px;font-size:11px;font-weight:600;letter-spacing:.06em;color:var(--mu);text-transform:uppercase}
+h2:first-child{margin-top:0}
+.row{display:flex;gap:6px;align-items:center;margin:4px 0;flex-wrap:wrap}
+select,input,button{font:inherit;color:var(--tx);background:#1b1d1f;border:1px solid var(--ln);border-radius:3px;padding:4px 6px}
+input[type=number]{width:72px}
+button{cursor:pointer}button:hover{border-color:var(--mu)}
+button.pri{background:var(--ac);color:#25282a;border-color:var(--ac)}
+button.on{border-color:var(--ac);color:var(--ac)}
+.ws button{padding:3px 6px}
+label.f{display:flex;align-items:center;gap:4px;color:var(--mu)}
+label.f span{width:14px}
+.mut{color:var(--mu)}
+#info{word-break:break-all;min-height:36px}
+#info code,#list code{font-size:10.5px;color:var(--mu)}
+#list{list-style:none;margin:0;padding:0}
+#list li{padding:5px 0;border-top:1px solid var(--ln);cursor:pointer}
+#list li:hover{color:var(--ac)}
+#list li.miss{opacity:.5}
+#list li b{display:block;font-weight:500;word-break:break-all}
+#list li i{display:block;font-style:normal;color:var(--mu)}
+kbd{font:10.5px ui-monospace,monospace;padding:0 4px;border:1px solid var(--ln);border-radius:2px}
+.keys{line-height:1.9;color:var(--mu)}
+dialog{width:min(760px,92vw);background:var(--pn);color:var(--tx);border:1px solid var(--ln);padding:14px}
+dialog textarea{width:100%;height:60vh;font:11px/1.5 ui-monospace,monospace;color:var(--tx);background:#1b1d1f;border:1px solid var(--ln)}
+</style>
+</head>
+<body class="on">
+<div id="stage">
+  <iframe id="fr" title="편집할 쪽"></iframe>
+  <div id="layer">
+    <div id="hov" class="box" hidden><span class="tag"></span></div>
+    <div id="sel" class="box" hidden><span class="tag"></span>
+      <i class="h" data-d="nw"></i><i class="h" data-d="n"></i><i class="h" data-d="ne"></i><i class="h" data-d="w"></i>
+      <i class="h" data-d="e"></i><i class="h" data-d="sw"></i><i class="h" data-d="s"></i><i class="h" data-d="se"></i>
+    </div>
+  </div>
+</div>
+<div id="shield"></div>
+<aside id="pn">
+  <h2>쪽 · 화면 폭</h2>
+  <div class="row"><select id="page"></select><button id="tog" class="on" title="E">편집 켜짐</button></div>
+  <div class="row ws" id="ws"></div>
+  <div class="row"><label class="f">폭 <input id="w" type="number" min="320" max="2560" step="1"></label><span class="mut" id="bk"></span></div>
+
+  <h2>선택한 요소</h2>
+  <div id="info" class="mut">편집이 켜진 상태에서 요소를 누르세요.</div>
+  <div class="row"><label class="f"><span>X</span><input id="tx" type="number" step="1"></label><label class="f"><span>Y</span><input id="ty" type="number" step="1"></label></div>
+  <div class="row"><label class="f"><span>W</span><input id="ww" type="number" step="1" min="0"></label><label class="f"><span>H</span><input id="hh" type="number" step="1" min="0"></label></div>
+  <div class="row"><label class="f"><span>×</span><input id="sc" type="number" step=".01" min=".05"></label><span class="mut">배율</span></div>
+  <div class="row">크기 조절 방식
+    <label class="f"><input type="radio" name="md" value="box" checked>너비·높이</label>
+    <label class="f"><input type="radio" name="md" value="scale">배율</label>
+  </div>
+  <div class="row"><button id="up" title="[">부모 선택</button><button id="dn" title="]">자식 선택</button><button id="rs" title="R">이 요소 되돌리기</button></div>
+
+  <h2>바꾼 요소 <span id="cnt"></span></h2>
+  <ul id="list"></ul>
+
+  <h2>내보내기</h2>
+  <div class="row"><button id="css" class="pri">이 쪽 CSS 보기</button><button id="json">모든 쪽 JSON 받기</button></div>
+  <div class="row"><button id="undo" title="⌘Z">되돌리기</button><button id="clr">이 쪽 모두 지우기</button></div>
+
+  <h2>단축키</h2>
+  <div class="keys">
+    <kbd>E</kbd> 편집 켜고 끄기(끄면 사이트를 그대로 조작)<br>
+    누르기: 선택 · 같은 자리 다시 누르기: 아래 겹친 요소<br>
+    <kbd>[</kbd> 부모 · <kbd>]</kbd> 자식 · <kbd>Esc</kbd> 선택 해제<br>
+    <kbd>←↑→↓</kbd> 1px 이동 · <kbd>Shift</kbd>+화살표 10px<br>
+    끌기 중 <kbd>Shift</kbd>: 한 축 고정 · 모서리는 비율 유지<br>
+    <kbd>R</kbd> 요소 되돌리기 · <kbd>⌘Z</kbd> 되돌리기
+  </div>
+</aside>
+<dialog id="dlg"><div class="row" style="justify-content:space-between"><b>내보내기</b><span><button id="copy" class="pri">복사</button> <button id="close">닫기</button></span></div><textarea id="out" readonly></textarea></dialog>
+<script src="edit.js"></script>
+</body>
+</html>
