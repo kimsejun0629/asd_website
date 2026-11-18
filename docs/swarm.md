@@ -29,7 +29,8 @@
 - PC 가로 가운데 `CX`(`center()`): 화면 가운데 65% + 글 블록 오른쪽 끝 · 카드 왼쪽 끝 사이 가운데 35% → 창 너비에 따라 가운데 쯤. 글 뒤로 지나가는 드론은 글 받침(`.sw-tx::before`)으로 흐려짐.
 - 이름표: 8방향 × 3거리 후보 가운데 상자 안 드론 수 · 다른 이름표 · 글 · 카드 · 로터가 돈 범위 · 화면 밖 점수가 가장 낮은 자리, 1초마다 다시 재되 확실히 나을 때만 옮김. 기준 드론(로터 제외)에서 지시선.
 - `KA.loop`: scroll · resize · IO · visibilitychange · 마우스로 깨움, 무대 밖 · 탭 숨김이면 멈춤. 움직임 줄임이면 첫 연출 · 흔들림 · 경로 없이 겹쳐 바뀌고 진행이 멈추면 루프도 멈춤.
-- 메뉴 '사업'(`#business`)은 첫 장(흉상), 첫 장 '사업 분야 보기'(`#swarm-uav`) · 스크롤 안내(`.scue`, 목차 위) · 목차는 해당 장으로 부드럽게. 두 `span.sw-mark`의 top은 swarm.js가 정함.
+- 메뉴 '사업'(`#business`)은 첫 장(흉상), 첫 장 '사업 분야 보기'(`#swarm-uav`) · 스크롤 안내(`.scue`, 목차 위) · 목차는 해당 장으로 부드럽게. 세 `span.sw-mark`의 top은 swarm.js가 정함.
+- `#mission-ai`(영상 쪽 닫기 `../index.html#mission-ai` · 뒤로 가기): 세 번째 마커 `span#mission-ai`가 마지막 장 가운데(`go(4)`와 같은 자리)에 놓여 site.js `arrive`가 바로 옮김(`hashchange`는 swarm.js가 `anchorTop`으로). 도착하면 첫 입력까지 `snap`으로 진행을 곧장 맞춤. 메인에서 영상 링크(`mission-ai/…?lang=ko|en`)를 누르면 site.js가 주소를 `#mission-ai`로 바꿔 두고(`replaceState`) 떠남 → 뒤로 가기(bfcache `pageshow` · 다시 불러오기 모두)도 그 장. 장을 늘리면 마커 식은 `NS-1`을 따름.
 
 ## 3. 바꿀 때
 

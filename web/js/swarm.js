@@ -4,13 +4,13 @@
    그리기: swarm-gl.js(window.SW) · 순서: site → scroll-fx → index → swarm-gl → 이 파일 */
 (()=>{
 'use strict';
-const {reduce,MQ,loop,smoothTo,HH}=window.KA;
+const {reduce,MQ,loop,smoothTo,HH,anchorTop}=window.KA;
 const SW=window.SW,sec=document.getElementById('swarm');
 if(!sec||!SW)return;
 const stage=sec.querySelector('.sw-stage'),cv=sec.querySelector('.sw-cv');
 const CH=[...sec.querySelectorAll('.sw-ch')],NS=CH.length;
 const rail=sec.querySelector('.sw-rail'),rb=rail?[...rail.querySelectorAll('button')]:[];
-const mark=document.getElementById('business'),mark1=document.getElementById('swarm-uav');   /* 메뉴 '사업' → 첫 장(흉상) · 첫 장 '사업 분야 보기' → 무인기 장 */
+const mark=document.getElementById('business'),mark1=document.getElementById('swarm-uav'),mark2=document.getElementById('mission-ai');   /* 메뉴 '사업' → 첫 장(흉상) · 첫 장 '사업 분야 보기' → 무인기 장 · #mission-ai → 마지막 장(영상 쪽에서 돌아옴) */
 const root=document.documentElement;root.classList.add('sw-on');
 /* 쪽 CSS가 옛 것(캐시)이거나 빠지면 무대가 고정되지 않음 → 캔버스 크기가 구역 높이를 다시 키우는 순환을 막고 글만 쌓아 둠 */
 if(getComputedStyle(cv).position!=='absolute'){root.classList.remove('sw-on');return}
@@ -201,7 +201,7 @@ const HOLD=.38;   /* 한 장 거리(U) 가운데 형상이 머무는 몫 — 나
 function measure(){
   vh=Math.min(stage.offsetHeight||innerHeight,innerHeight*1.5);
   U=Math.max(1,(sec.offsetHeight-vh)/(NS-.5));
-  if(mark)mark.style.top=Math.round(HH())+'px';if(mark1)mark1.style.top=Math.round(U*(1+HOLD*.5)+HH())+'px';   /* anchorTop이 머리글 높이를 빼므로 그만큼 더함 */
+  if(mark)mark.style.top=Math.round(HH())+'px';if(mark1)mark1.style.top=Math.round(U*(1+HOLD*.5)+HH())+'px';if(mark2)mark2.style.top=Math.round(U*(NS-1+HOLD*.5)+HH())+'px';   /* anchorTop이 머리글 높이를 빼므로 그만큼 더함 */
   cssW=stage.clientWidth||innerWidth;cssH=vh;asp=cssW/cssH;
   dpr=Math.min(devicePixelRatio||1,narrow.matches?1.75:2);
   R.size(Math.round(cssW*dpr),Math.round(cssH*dpr));
@@ -215,14 +215,14 @@ function target(){
 }
 
 /* ── 한 프레임 ── */
-let P=0,PT=0,t0=0,last=0,intro=reduce?1:0,vis=true,mx=0,my=0,cmx=0,cmy=0,act=-2,vp=null;
+let snap=0,P=0,PT=0,t0=0,last=0,intro=reduce?1:0,vis=true,mx=0,my=0,cmx=0,cmy=0,act=-2,vp=null;
 const eio=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
 const FA=new Float32Array(NU*8),FB=new Float32Array(NU*8);
 function frame(now){
   if(!SH)return false;
   if(!t0)t0=now;
   const t=(now-t0)/1000,dt=last?Math.min(.05,(now-last)/1000):1/60;last=now;
-  PT=target();
+  PT=target();if(snap)P=PT;
   P+=(PT-P)*(1-Math.exp(-dt*(reduce?60:7)));if(Math.abs(PT-P)<1e-4)P=PT;
   if(intro<1)intro=Math.min(1,t/2.8);
   cmx+=(mx-cmx)*(1-Math.exp(-dt*3));cmy+=(my-cmy)*(1-Math.exp(-dt*3));
@@ -371,6 +371,12 @@ sec.querySelectorAll('a[href="#swarm-uav"]').forEach(a=>a.addEventListener('clic
   cue.addEventListener('transitionend',e=>{if(e.target===cue&&e.propertyName==='opacity')rest()});
   const hide=()=>{const o=scrollY>40;if(o===cue.classList.contains('off'))return;cue.classList.toggle('off',o);clearTimeout(zt);if(o)zt=setTimeout(()=>{if(getComputedStyle(cue).opacity==='0')rest()},700);else cue.classList.remove('idle')};
   addEventListener('scroll',hide,{passive:true});hide()}
+/* #mission-ai(영상 쪽 닫기 · 뒤로 가기): 마지막 장으로 바로 — 위치는 site.js arrive가 마커로 맞추고, 여기서는 진행을 따라가지 않고 곧장 맞춤(첫 입력까지) */
+const lands=()=>location.hash==='#mission-ai';
+snap=lands()?1:0;
+['wheel','touchstart','keydown','mousedown'].forEach(t=>addEventListener(t,()=>{snap=0},{passive:true}));
+addEventListener('hashchange',()=>{if(lands()&&mark2){snap=1;scrollTo({top:Math.max(0,Math.round(anchorTop(mark2))),left:0,behavior:'instant'});wake()}});
+addEventListener('pageshow',e=>{if(e.persisted&&lands()){snap=1;wake()}});
 SW.run=1;   /* 시작함 — 없으면 머리 인라인 스크립트가 DOMContentLoaded에 sw-on을 뗌(index*.html) */
 fetch('data/swarm.txt?v=35ec5fe9').then(r=>{if(!r.ok)throw new Error(r.status);return r.text()}).then(t=>{SH=parse(unb64(t));assign();try{AI=SW.ai?SW.ai(SH,NU):null}catch(e){console.warn('swarm-ai',e)}fit();t0=0;wake()})
   .catch(e=>{console.warn('swarm',e);root.classList.add('sw-nodata');CH.forEach((c,i)=>c.classList.toggle('on',i===0))});

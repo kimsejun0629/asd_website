@@ -68,7 +68,7 @@
   "bytes": 2859
  },
  {
-  "path": "assets/index-DtFWWRoo.js",
+  "path": "assets/index-n3L8oZHM.js",
   "bytes": 14605
  },
  {
@@ -136,8 +136,8 @@
   "bytes": 1015
  },
  {
-  "path": "assets/start-tIugQgGA.js",
-  "bytes": 126530
+  "path": "assets/start-BpM1C84x.js",
+  "bytes": 131596
  },
  {
   "path": "assets/typed-DWmzlOXH.js",
@@ -422,5 +422,9 @@
  {
   "path": "plate_S6_scrub_540.mp4",
   "bytes": 7355246
+ },
+ {
+  "path": "site-logo.svg",
+  "bytes": 6162
  }
 ]
