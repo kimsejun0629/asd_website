@@ -1,0 +1,1 @@
+{"PLATE_LIVE":{"DC":{"run":"DC","take":1,"cut":"QUGV_LANDING","y0":3707,"vhPerFrame":2,"n":231,"y1":4167,"file":"plate_DC_take1_live_scrub","g0":1760,"g1":2279.5,"note":"Kling 플레이트 + 애니메틱 HUD 합성(tools/runway/p2hud.py · p2hud_comp.py) — 실시간 HUD 판: 벡터 · 글자는 웹이 그린다(data/p2hud_DC, tools/runway/web_p2hud.py)","hud":"data/p2hud_DC"}}}

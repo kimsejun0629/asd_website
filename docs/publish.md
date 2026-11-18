@@ -3,12 +3,13 @@
 `web/`을 claude.ai 아티팩트로 올리거나 게시본과 맞출 때 읽는다. 검사 방법은 verify.md, 도구 목록은 tools.md.
 
 - 게시 주소: https://claude.ai/artifact/8PVpxzCfkjLGqoRoqLs2tV — **여러 세션이 게시한다. 게시본이 기준이다.**
-- 2026-10-20 게시: v64(id `1792505211-4909`, 285개) = `web/` = `_archive/live-v64/` — 14쪽 favicon(`img/favicon.svg`). v63(`1792423318-2830`) · v61(리팩터 §5) = `_archive/live-v63/` · `live-v61/`. v60(`1790421930-d731`) = `_archive/pre-refactor-v60/`. 스냅숏의 `video/`는 `web/video` 링크. 게시 전 1절을 반드시 수행한다.
+- `web/mission-ai/` = ke-map 번들(손대지 않음). **GitHub Pages 전용**, 아티팩트에는 올리지 않는다(CTA가 끊김).
+- 2026-10-20 게시: v64(id `1792505211-4909`, 285개) = `web/` = `_archive/live-v64/` — 14쪽 favicon(`img/favicon.svg`). v63(`1792423318-2830`) · v61(리팩터 §5) = `_archive/live-v63/` · `live-v61/`. v60(`1790421930-d731`) = `_archive/pre-refactor-v60/`. 스냅숏 `video/`는 `web/video` 링크. 게시 전 1절 수행.
 
 ## 1. 고치기 전: 게시본과 맞추기
 
 1. Artifact `list`(`scope=files`, `url`=게시 주소) → 버전 id와 파일 목록(경로 · 크기, 해시는 없음)을 받는다.
-2. `web/`과 비교한다. 새 파일 · 크기가 다른 파일 · 의심되는 파일은 Artifact `read`(`path`)로 받아 sha1을 비교하고, 게시본이 새 것이면 `web/`에 반영한다. 덮기 전의 로컬 파일은 `_archive/`에 둔다(예: `web-local-before-sync-20260925/`).
+2. `web/`과 비교한다. 새 파일 · 크기가 다른 파일 · 의심되는 파일은 Artifact `read`(`path`)로 받아 sha1을 비교하고, 게시본이 새 것이면 `web/`에 반영한다. 덮기 전 로컬 파일은 `_archive/`에 둔다.
 3. 게시본의 `data/*.json`이 한 줄 압축형이면 받은 뒤 `python3 tools/data/fmtjson.py`로 다시 정리한다(값 · 순서는 그대로, 공백만 바뀜). 새 한글 음절이 섞여 왔는지 §4로 본다.
 
 ## 2. 게시 절차
@@ -42,7 +43,7 @@
 - HTML의 로컬 CSS/JS, index preload, 3D 모듈 import에는 `?v=refactor-d1`이 붙는다(`tools/verify/release.py`). 공용 계약 변경 시 식별자를 올려 함께 게시한다. 파일명·동기 실행 순서는 그대로다.
 - v60 `site.js`가 새 코드와 섞이면 히어로·스트립·뉴스·뉴스룸·영문 채용·무인기·연혁이 멈추고 본문이 숨을 수 있다. 릴리스 URL로 옛 URL의 캐시를 분리했다. 호스트가 쿼리를 유지하는지는 게시 후 Network에서 확인하고, 새 탭에서 위 기능을 확인한다. 쿼리를 없애거나 무시하는 호스트라면 게시 전에 파일명 버전 방식으로 바꿔야 한다.
 - 초기 표시: 국문 메인은 게시 틀의 CSS 전 크림색 프레임이 사라졌다. 외부 파일 분리로 느린 망에서는 UAV 무대·메인 영상 시작이 첫 표시보다 늦을 수 있다. index.js preload는 개선되어 유지했고, UAV preload는 효과가 없어 철회했다.
-- MRO 육지는 fetch 뒤 표시된다. preload는 WebKit 중복 요청 때문에 철회했다. 실패는 콘솔 `mro-land` 경고로 남긴다.
+- MRO 육지는 fetch 뒤 표시된다. preload는 WebKit 중복 요청 때문에 철회했다. 실패는 `mro-land` 경고로 남긴다.
 
 ## 5. 리팩터(Stage A~D, v61에 게시): 변경 목록은 매번 재생성
 

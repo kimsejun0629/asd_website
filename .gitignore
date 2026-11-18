@@ -4,7 +4,10 @@ _archive/
 _verification/
 _out/
 research/
-assets/
+/assets/
+
+# 파이썬 캐시(어느 폴더에 있든)
+__pycache__/
 
 # 현행이 아닌 도구
 tools/pylib/

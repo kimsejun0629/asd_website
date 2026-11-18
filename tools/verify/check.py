@@ -16,6 +16,8 @@ import release
 
 ROOT = Path(__file__).resolve().parents[2]
 WEB = ROOT / 'web'
+# mission-ai/ = 별도 빌드 앱(ke-map), 사이트 코드 규칙 밖. 파일 검사에서만 빼고 링크 확인은 그대로 한다.
+MISSION = WEB / 'mission-ai'
 TEXT = {'.html', '.css', '.js', '.json', '.svg'}
 
 
@@ -48,7 +50,7 @@ def main():
                         *((p, 8192) for p in (ROOT / 'docs').glob('*.md'))]:
         if path.stat().st_size > limit:
             errors.append(f'{path.relative_to(ROOT)}: 문서 {path.stat().st_size} B(한도 {limit})')
-    files = sorted(p for p in WEB.rglob('*') if p.suffix in TEXT and p.is_file())
+    files = sorted(p for p in WEB.rglob('*') if p.suffix in TEXT and p.is_file() and not p.is_relative_to(MISSION))
     js_count = 0
     node = shutil.which('node')
     if not node:

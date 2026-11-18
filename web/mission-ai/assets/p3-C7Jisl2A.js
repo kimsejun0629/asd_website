@@ -1,0 +1,2 @@
+const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["./p3board-BgwAeLb6.js","./registry-ChiJXsfH.js","./uikit-D7wo2A9W.js","./typed-DWmzlOXH.js","./ui-BAPSsyyW.js","./data-C6nDLf2X.js","./sprite-DgG2QB37.js"])))=>i.map(i=>d[i]);
+import{t as e}from"./data-C6nDLf2X.js";import{t}from"./preload-helper-DclECHGd.js";e.P2UID_P3&&await t(()=>import(`./p3board-BgwAeLb6.js`),__vite__mapDeps([0,1,2,3,4,5,6]),import.meta.url);

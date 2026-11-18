@@ -1,0 +1,1 @@
+var e={};async function t(t){try{let n=await fetch(new URL(`data/${t}.json`,document.baseURI));if(!n.ok)throw Error(String(n.status));let r=await n.json(),i=e;for(let[e,t]of Object.entries(r))(e===`PLATE_RUNS`||e===`PLATE_LIVE`)&&i[e]?Object.assign(i[e],t):i[e]=t;return!0}catch(e){return console.warn(`data`,t,e.message),!1}}export{t as n,e as t};

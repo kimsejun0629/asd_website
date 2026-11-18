@@ -1,0 +1,54 @@
+{
+ "note": "자동 생성: tools/audio/bgm.py loop (decisions §71). 웹은 AudioBufferSourceNode loop=true · loopStart/loopEnd(초)로 돈다.",
+ "lufs": -16.0,
+ "p1": {
+  "file": "bgm_p1.m4a",
+  "loopStart": 47.523991,
+  "loopEnd": 137.525147,
+  "length": 138.125,
+  "bpm": 96.0,
+  "bar": 2.5,
+  "bar0": 0.024,
+  "barsA": 19,
+  "barsB": 55,
+  "xfBars": 1.0,
+  "gainDb": -4.0,
+  "lufsIn": -12.0,
+  "refineMs": 1.15,
+  "refineNcc": 0.961,
+  "src": "bgm_p1_take1.mp3",
+  "note": "96 BPM · 36마디 한 바퀴가 그대로 두 번 — 19→55마디(90초)를 돈다",
+  "seam": {
+   "sampleJump": 0.012778475880622864,
+   "typical99": 0.053950235247612,
+   "envJumpDb": 2.103656768798828,
+   "envJumpOrigDb": 2.103656768798828,
+   "meanDiffDb": 0.3923400640487671
+  }
+ },
+ "p2": {
+  "file": "bgm_p2.m4a",
+  "loopStart": 5.047234,
+  "loopEnd": 75.78542,
+  "length": 76.385,
+  "bpm": 95.007,
+  "bar": 2.52612,
+  "bar0": -0.005,
+  "barsA": 2,
+  "barsB": 30,
+  "xfBars": 1.0,
+  "gainDb": -4.0,
+  "lufsIn": -12.0,
+  "refineMs": 6.81,
+  "refineNcc": 0.86,
+  "src": "bgm_p2_take1.mp3",
+  "note": "95 BPM · A(0-7) B(8-15) C(16-27) A'(28-31) D(32-39) B'(40-47) 끝(48-) — 2→30마디(70.7초): A'가 A를 마디마다 되풀이해 29마디(A' 둘째)를 1마디(A 둘째)로 교차하고 2마디로 잇는다(교차 마디 크로마 0.986 · 박 상관 0.93, B'→B 후보 10→42는 0.918)",
+  "seam": {
+   "sampleJump": 0.009948823601007462,
+   "typical99": 0.02871180698275566,
+   "envJumpDb": 0.8789100646972656,
+   "envJumpOrigDb": 0.8789100646972656,
+   "meanDiffDb": 1.1246331930160522
+  }
+ }
+}

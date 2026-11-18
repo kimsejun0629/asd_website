@@ -1,0 +1,1 @@
+function e(e){e.__realNow=e.performance.now.bind(e.performance),e.__vt=0,e.performance.now=()=>e.__vt*1e3}var t=(e,t=window)=>t.__realNow?performance.now():e;export{e as n,t};

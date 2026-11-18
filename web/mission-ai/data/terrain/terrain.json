@@ -1,0 +1,62 @@
+{
+ "version": 1,
+ "generator": "tools/terrain/bake.py",
+ "seed": 20261109,
+ "masterSha256": "0859baeb3d6e308dd3177fd9758aa275c9cb4bd86101e2383a37cf953ed40e09",
+ "units": "m",
+ "frames": {
+  "en": "E = 동(+), N = 북(+), h = 해발. 원점 = 타일 중심, 해수면 0",
+  "web": "three.js·glTF: X = E, Y = h, Z = -N",
+  "blender": "x = E, y = N, z = h"
+ },
+ "extent": {
+  "minE": -6144.0,
+  "maxE": 6144.0,
+  "minN": -6144.0,
+  "maxN": 6144.0,
+  "size": 12288.0
+ },
+ "grid": {
+  "rowOrder": "north-to-south",
+  "colOrder": "west-to-east"
+ },
+ "master": {
+  "n": 4097,
+  "spacing": 3.0,
+  "file": "renders/terrain/height_4097.f32",
+  "encoding": "f32le"
+ },
+ "web": {
+  "n": 1025,
+  "spacing": 12.0,
+  "decimation": 4,
+  "file": "terrain/height_1025.u16",
+  "encoding": "u16le",
+  "offset": -53,
+  "scale": 0.008072022583352408,
+  "quantizationErrorMax": 0.004072957189180215
+ },
+ "cover": {
+  "file": "renders/terrain/cover_4097.png",
+  "channels": {
+   "r": "forest",
+   "g": "sand",
+   "b": "bare",
+   "a": "rock"
+  }
+ },
+ "seaLevel": 0.0,
+ "heightRange": [
+  -52.511940002441406,
+  475.5006103515625
+ ],
+ "contour": {
+  "interval": 20.0,
+  "index": 100.0,
+  "gradientMax": 800.0,
+  "edgeFade": 970.0,
+  "note": "ConOps GCS 방식: 주곡선·계곡선, 높이 그라데이션, 해안선 강조, 점 필드, 가장자리 페이드"
+ },
+ "checkpoints": "terrain/checkpoints.json",
+ "world": "terrain/world.json"
+}

@@ -56,12 +56,12 @@ const HOME=EN?'index-en.html':'index.html';
 
 const NAV=EN?[
  {t:'Company',h:'company-en.html',k:'company',sub:[['Message from the Head','greeting'],['About Us','about'],['History','history'],['Locations','locations']]},
- {t:'Business',h:'index-en.html#business',k:'business',sub:[['Aerostructures','aero-en.html'],['Unmanned Systems','uav-en.html'],['MRO & Upgrade','mro-en.html']]},
+ {t:'Business',h:'index-en.html#business',k:'business',sub:[['Aerostructures','aero-en.html'],['Unmanned Systems','uav-en.html'],['MRO & Upgrade','mro-en.html'],['Mission AI Platform','mission-ai/index.html']]},
  {t:'Newsroom',h:'newsroom-en.html',k:'newsroom',sub:[['News','news'],['Videos','video'],['Brochures','brochure']],ext:['Korean Air Newsroom','https://news.koreanair.com/']},
  {t:'Careers',h:'careers-en.html',k:'careers',sub:[['Job Openings','jobs'],['Roles','roles'],['Growth & Development','growth'],['Work Locations','sites'],['Benefits','benefits'],['Hiring Process','process']],ext:['Korean Air Careers',JOBS]}
 ]:[
  {t:'회사소개',h:'company.html',k:'company',sub:[['인사말','greeting'],['본부 소개','about'],['연혁','history'],['사업장','locations']]},
- {t:'사업',h:'index.html#business',k:'business',sub:[['항공기체','aero.html'],['무인기','uav.html'],['MRO/U','mro.html']]},
+ {t:'사업',h:'index.html#business',k:'business',sub:[['항공기체','aero.html'],['무인기','uav.html'],['MRO/U','mro.html'],['Mission AI Platform','mission-ai/index.html']]},
  {t:'뉴스룸',h:'newsroom.html',k:'newsroom',sub:[['뉴스','news'],['홍보영상','video'],['브로슈어','brochure']],ext:['대한항공 뉴스룸','https://news.koreanair.com/']},
  {t:'인재채용',h:'careers.html',k:'careers',sub:[['채용 공고','jobs'],['직무 소개','roles'],['성장 · 양성','growth'],['근무지','sites'],['복리후생','benefits'],['전형 절차','process']],ext:['대한항공 채용 사이트',JOBS]}
 ];
@@ -100,14 +100,14 @@ if(gf){
   const KA_BASE=`https://www.koreanair.com/kr/${EN?'en':'ko'}/footer/about-us`;
   const cols=EN?[
     col('Company',[['Message from the Head','company-en.html#greeting'],['About Us','company-en.html#about'],['History','company-en.html#history'],['Locations','company-en.html#locations']]),
-    col('Business',[['Aerostructures','aero-en.html'],['Unmanned Systems','uav-en.html'],['MRO & Upgrade','mro-en.html']]),
+    col('Business',[['Aerostructures','aero-en.html'],['Unmanned Systems','uav-en.html'],['MRO & Upgrade','mro-en.html'],['Mission AI Platform','mission-ai/index.html']]),
     col('Newsroom',[['News','newsroom-en.html#news'],['Videos','newsroom-en.html#video'],['Brochures','newsroom-en.html#brochure']]),
     col('Careers',[['Job Openings','careers-en.html#jobs'],['Roles','careers-en.html#roles'],['Benefits','careers-en.html#benefits'],['Korean Air Careers',JOBS,1]]),
     col('Korean Air',[['About Korean Air',`${KA_BASE}/who-we-are/overview/greetings`,1],['Corporate Governance',`${KA_BASE}/corporate-governance/mission`,1],['Investor Relations',`${KA_BASE}/investor-relations/financial-information`,1],['Sustainability',`${KA_BASE}/sustainable-management/report`,1]]),
     col('Family Sites',[['Korean Air','https://www.koreanair.com/',1],['Korean Air Newsroom','https://news.koreanair.com/',1],['Korean Air Cargo','https://cargo.koreanair.com/',1],['Hanjin KAL','https://www.hanjinkal.co.kr/',1],['Business Jet','https://bizjet.koreanair.com/',1],['Jumbos Volleyball Club','https://jumbos.kovo.co.kr/',1],['Jin Air','https://www.jinair.com/',1]])
   ]:[
     col('회사소개',[['인사말','company.html#greeting'],['본부 소개','company.html#about'],['연혁','company.html#history'],['사업장','company.html#locations']]),
-    col('사업',[['항공기체','aero.html'],['무인기','uav.html'],['MRO/U','mro.html']]),
+    col('사업',[['항공기체','aero.html'],['무인기','uav.html'],['MRO/U','mro.html'],['Mission AI Platform','mission-ai/index.html']]),
     col('뉴스룸',[['뉴스','newsroom.html#news'],['홍보영상','newsroom.html#video'],['브로슈어','newsroom.html#brochure']]),
     col('인재채용',[['채용 공고','careers.html#jobs'],['직무 소개','careers.html#roles'],['복리후생','careers.html#benefits'],['대한항공 채용 사이트',JOBS,1]]),
     col('대한항공',[['대한항공에 대하여',`${KA_BASE}/who-we-are/overview/greetings`,1],['기업지배구조',`${KA_BASE}/corporate-governance/mission`,1],['투자정보',`${KA_BASE}/investor-relations/financial-information`,1],['지속가능경영',`${KA_BASE}/sustainable-management/report`,1]]),

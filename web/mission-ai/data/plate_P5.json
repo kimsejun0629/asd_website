@@ -1,0 +1,1 @@
+{"PLATE_RUNS":{"P5":{"run":"E-L","take":1,"cut":null,"y0":5800,"vhPerFrame":2,"n":543,"y1":6884,"file":"plate_P5_take1_hud_scrub","g0":2980,"g1":3479.36,"note":"Kling 플레이트 + 애니메틱 HUD 합성(tools/runway/p2hud.py · p2hud_comp.py --pair) · 칼럼 런 E-L 테이크 1 + E-R 테이크 1: 효과 층 · 열영상 · 칼럼별 HUD 층과 글자(decisions §62 · §63)","runs":["E-L","E-R"],"takes":[1,1]}}}

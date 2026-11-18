@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Mission AI Platform — KE-MAP</title>
+<meta name="description" content="Mission AI Platform — KE-MAP 원테이크 스크롤 필름. 스크롤로 임무 설계에서 승인, 실행, 복귀까지.">
+<meta property="og:title" content="Mission AI Platform — KE-MAP">
+<meta name="theme-color" content="#0B0F14">
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* 전체 페이지(7574vh, src/scenes.config.ts PAGE_VH) 스크롤 테스트 — 지금까지 만든 구간은 실사·실시간으로, 나머지는 Blender M0 애니메틱.
+     실사 구간: SAT Kling 클립(i2v, y 63~111vh) · 런 B Kling 테이크 2(y 297.18~1621.18vh, 2vh/프레임).
+     실시간 층: GCS 운용자 화면(gcs.js: S1 · S4→S5 · S5 임무 생성·실행 인가, 애니메틱과 같은 UI px 배치·사건 시각), 런 B POV HUD, SAT 오버레이.
+     색은 src/tokens.ts 값을 옮겼다. */
+  :root {
+    --bg:#0B0F14; --text:#E8E6E1; --uav:#8FC8D7; --ugv:#DCB783; --usv:#82A0CD; --ai:#A89CCF; --threat:#D47075;
+    --line:rgba(232,230,225,.14); --dim:rgba(232,230,225,.6);
+    --mono:'IBM Plex Mono',Menlo,monospace; --sans:'IBM Plex Sans',-apple-system,'Apple SD Gothic Neo',sans-serif;
+  }
+  html,body { margin:0; background:var(--bg); color:var(--text); font-family:var(--sans); }
+  #track { height:7674vh; }
+  #stage { position:fixed; inset:0; overflow:hidden; background:var(--bg); }
+  .full { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; visibility:hidden; }
+  .full.on { visibility:visible; }
+  #ui, #hud, #pl { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
+  #pl { visibility:hidden; } #pl.on { visibility:visible; }
+  #cpl { position:absolute; inset:0; pointer-events:none; }
+  #cpl .pw { position:absolute; overflow:hidden; visibility:hidden; } #cpl .pw.on { visibility:visible; }
+  #cpl .pw video { position:absolute; left:0; top:0; width:1920px; height:1080px; transform-origin:0 0; }
+  #ui { visibility:hidden; transform-origin:0 0; } #ui.on { visibility:visible; }
+  #p2 { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; visibility:hidden; } #p2.on { visibility:visible; }   /* 2부 운용자 화면 실시간 층(p2ui.js) */
+  #dl { position:absolute; left:0; top:0; display:block; visibility:hidden; } #dl.on { visibility:visible; }   /* 2부 런 DC · P5 플레이트 + 실시간 HUD(p2hud.js, 같은 rAF · 같은 캔버스) */
+  #rc { position:absolute; left:0; top:0; display:block; visibility:hidden; } #rc.on { visibility:visible; }   /* 런 A 플레이트를 GUI와 같은 rAF에 그린다(크기는 layout에서 W×Hh px) */
+  #rgl { position:absolute; left:0; top:0; display:block; visibility:hidden; } #rgl.on { visibility:visible; }   /* 런 A WebGL2 합성(플레이트 + 노트북 GUI + 광원, runa_gl.js) */
+  #lap { position:absolute; left:0; top:0; width:1920px; height:1080px; transform-origin:0 0; display:block; visibility:hidden; pointer-events:none; } #lap.on { visibility:visible; }   /* 노트북 GUI(1920×1080 통째, matrix3d로 화면 사각형에) */
+  #vB { position:absolute; left:0; top:0; width:100px; height:56.25px; object-fit:cover; transform-origin:0 0; display:block; visibility:hidden; will-change:transform; }
+  #vB.on { visibility:visible; }
+  /* S5 커서 초점(brief 5절): 커서 둘레만 선명, 나머지는 약하게 흐리고 18% 어둡게 */
+  #dof { position:absolute; inset:0; pointer-events:none; opacity:0; backdrop-filter:blur(1.4px) brightness(.82); -webkit-backdrop-filter:blur(1.4px) brightness(.82);
+         --x:50%; --y:50%; --r0:200px; --r1:540px;
+         -webkit-mask-image:radial-gradient(circle at var(--x) var(--y), transparent var(--r0), rgba(0,0,0,.3) calc((var(--r0) + var(--r1)) / 2), #000 var(--r1));
+                 mask-image:radial-gradient(circle at var(--x) var(--y), transparent var(--r0), rgba(0,0,0,.3) calc((var(--r0) + var(--r1)) / 2), #000 var(--r1)); }
+  #gl { position:absolute; inset:0; pointer-events:none; visibility:hidden; }
+  #gl.on { visibility:visible; }
+  #badge { position:fixed; left:14px; bottom:12px; z-index:3; font:500 10px var(--mono); letter-spacing:.06em; color:var(--text);
+           display:flex; align-items:center; gap:8px; max-width:calc(100vw - 120px); background:rgba(11,15,20,.55); padding:5px 8px; }
+  #badge i { width:7px; height:7px; border-radius:50%; flex:none; }
+  #badge b { white-space:nowrap; }
+  #badge span { color:var(--dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  /* 세로 화면: 16:9 애니메틱(GUI가 구워져 있다)은 잘리지 않게 전체를 보인다. 실사 플레이트(환경)는 화면을 채운다 */
+  @media (max-aspect-ratio: 1/1) { #vA, #vD, #vE { object-fit:contain; } #badge span { display:none; } }
+  #rail { position:fixed; right:0; top:0; bottom:0; width:18px; z-index:3; cursor:pointer; }
+  #rail div.s { position:absolute; right:4px; width:6px; box-sizing:border-box; border-top:1px solid rgba(11,15,20,.9); }
+  #rail div.s.k { background:rgba(232,230,225,.85); }
+  #rail div.s.r { background:rgba(168,156,207,.75); }
+  #rail div.s.a { background:rgba(232,230,225,.18); }
+  #rail div.s:hover::after { content:attr(data-l); position:absolute; right:12px; top:0; white-space:nowrap; font:500 10px var(--mono);
+           background:rgba(11,15,20,.9); color:var(--text); padding:3px 6px; }
+  #rail #pos { position:absolute; right:0; width:14px; height:2px; background:var(--threat); }
+  #chk { position:fixed; right:24px; bottom:10px; z-index:3; font:500 10px var(--mono); letter-spacing:.1em; color:var(--text);
+         background:rgba(11,15,20,.6); border:1px solid var(--line); padding:6px 10px; cursor:pointer; }
+  #chk.on { border-color:var(--uav); color:var(--uav); }
+  #hint { position:fixed; left:50%; bottom:46px; transform:translateX(-50%); font:500 11px var(--mono); letter-spacing:.3em; z-index:3; }
+  html.pub #badge, html.pub #chk { display:none !important; }
+  html.rec #badge, html.rec #rail, html.rec #chk, html.rec #hint, html.rec #auto { display:none !important; }
+  #load { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; font:500 11px var(--mono); letter-spacing:.2em; color:var(--dim); z-index:4; pointer-events:none; }
+</style>
+  <script type="module" crossorigin src="./assets/index-DtFWWRoo.js"></script>
+  <link rel="modulepreload" crossorigin href="./assets/clock-DE-1KgMS.js">
+  <link rel="modulepreload" crossorigin href="./assets/flags-ChJHfxR6.js">
+  <link rel="modulepreload" crossorigin href="./assets/data-C6nDLf2X.js">
+  <link rel="modulepreload" crossorigin href="./assets/cut-D_IMfbgw.js">
+  <link rel="modulepreload" crossorigin href="./assets/preload-helper-DclECHGd.js">
+</head>
+<body>
+<div id="track"></div>
+<div id="stage">
+  <video id="vA" class="full" muted playsinline preload="auto"></video>
+  <video id="vS" class="full" muted playsinline preload="auto"></video>
+  <video id="vR" class="full" muted playsinline preload="auto"></video>
+  <video id="vD" class="full" muted playsinline preload="auto"></video>
+  <video id="vE" class="full" muted playsinline preload="auto"></video>
+  <canvas id="dl"></canvas>
+  <canvas id="rc"></canvas>
+  <canvas id="rgl"></canvas>
+  <div id="cpl"></div>
+  <canvas id="pl"></canvas>
+  <canvas id="ui"></canvas>
+  <canvas id="p2"></canvas>
+  <canvas id="lap"></canvas>
+  <video id="vB" muted playsinline preload="auto"></video>
+  <div id="dof"></div>
+  <canvas id="hud"></canvas>
+  <div id="gl"></div>
+</div>
+<div id="rail"><div id="pos"></div></div>
+<div id="badge"><i></i><b></b><span></span></div>
+<button id="chk" type="button">CHECK</button>
+<div id="hint">SCROLL</div>
+<div id="load">LOADING</div>
+</body>
+</html>

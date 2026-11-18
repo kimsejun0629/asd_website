@@ -14,7 +14,7 @@ def syl(t):   # 원문 한 덩어리에서 화면 글로 셀 한글 음절(주�
 def used():
     s=set()
     for dp,dn,fn in os.walk(WEB):
-        if dp.startswith(f'{WEB}/video'):continue
+        if dp.startswith((f'{WEB}/video',f'{WEB}/mission-ai')):continue  # mission-ai/ = 별도 빌드 앱(ke-map), 사이트 글꼴 밖
         for f in fn:
             if not f.endswith(('.html','.js','.json','.css')):continue
             s|=syl(open(os.path.join(dp,f),encoding='utf8').read())

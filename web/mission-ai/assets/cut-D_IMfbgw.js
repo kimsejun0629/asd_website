@@ -1,0 +1,1 @@
+import{t as e}from"./data-C6nDLf2X.js";import{t}from"./flags-ChJHfxR6.js";var n=(t().qs.get(`cut`)??`QUGV_LANDING`).replace(/[^A-Z0-9_]/g,``);window.CUT=e.CUT=n;export{n as t};

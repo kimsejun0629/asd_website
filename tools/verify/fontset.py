@@ -8,7 +8,7 @@ WEB=os.path.abspath(sys.argv[1]) if len(sys.argv)>1 else f'{ROOT}/web'
 def used(web):
     s={}
     for dp,dn,fn in os.walk(web):
-        if dp.startswith(f'{web}/video'):continue
+        if dp.startswith((f'{web}/video',f'{web}/mission-ai')):continue  # mission-ai/ = 별도 빌드 앱(ke-map), 사이트 글꼴 밖
         for f in fn:
             if not f.endswith(('.html','.js','.json','.css')):continue
             p=os.path.join(dp,f);t=open(p,encoding='utf8').read()

@@ -1,0 +1,426 @@
+[
+ {
+  "path": "anim_scrub.mp4",
+  "bytes": 63049398
+ },
+ {
+  "path": "anim_scrub_360.mp4",
+  "bytes": 24011225
+ },
+ {
+  "path": "anim_scrub_QUGV_LANDING.mp4",
+  "bytes": 62537010
+ },
+ {
+  "path": "anim_scrub_QUGV_LANDING_360.mp4",
+  "bytes": 23675505
+ },
+ {
+  "path": "assets/clock-DE-1KgMS.js",
+  "bytes": 175
+ },
+ {
+  "path": "assets/cut-D_IMfbgw.js",
+  "bytes": 176
+ },
+ {
+  "path": "assets/data-B_gh4RvC.js",
+  "bytes": 596
+ },
+ {
+  "path": "assets/data-C6nDLf2X.js",
+  "bytes": 348
+ },
+ {
+  "path": "assets/dispatcher-DxNyMMmr.js",
+  "bytes": 3418
+ },
+ {
+  "path": "assets/draco_decoder-C32yEggz.wasm",
+  "bytes": 285747
+ },
+ {
+  "path": "assets/draco_decoder-Z1_iN-Ht.wasm",
+  "bytes": 192420
+ },
+ {
+  "path": "assets/draco_decoder-fzg4nYZr.js",
+  "bytes": 719410
+ },
+ {
+  "path": "assets/draco_wasm_wrapper-DxJM36Ib.js",
+  "bytes": 58763
+ },
+ {
+  "path": "assets/draco_wasm_wrapper-fZCQGLGb.js",
+  "bytes": 58456
+ },
+ {
+  "path": "assets/draw-DQrEyqF6.js",
+  "bytes": 28592
+ },
+ {
+  "path": "assets/flags-ChJHfxR6.js",
+  "bytes": 408
+ },
+ {
+  "path": "assets/hud-Dv_NZ2pJ.js",
+  "bytes": 2859
+ },
+ {
+  "path": "assets/index-DtFWWRoo.js",
+  "bytes": 14605
+ },
+ {
+  "path": "assets/layer-BggmTYyV.js",
+  "bytes": 738583
+ },
+ {
+  "path": "assets/loader-Cc7IaXNZ.js",
+  "bytes": 1741
+ },
+ {
+  "path": "assets/map-CxHljb_v.js",
+  "bytes": 42
+ },
+ {
+  "path": "assets/map-hz07IhMz.js",
+  "bytes": 10821
+ },
+ {
+  "path": "assets/opsShared-DCGEym5F.js",
+  "bytes": 1203
+ },
+ {
+  "path": "assets/p2-CbOlD6Ty.js",
+  "bytes": 9743
+ },
+ {
+  "path": "assets/p3-C7Jisl2A.js",
+  "bytes": 423
+ },
+ {
+  "path": "assets/p3board-BgwAeLb6.js",
+  "bytes": 13901
+ },
+ {
+  "path": "assets/p4-uDdBrVFX.js",
+  "bytes": 768
+ },
+ {
+  "path": "assets/p4window-DIFXT2GP.js",
+  "bytes": 14571
+ },
+ {
+  "path": "assets/p6-Ce_Yur_c.js",
+  "bytes": 804
+ },
+ {
+  "path": "assets/panel-BI2HxF6F.js",
+  "bytes": 2874
+ },
+ {
+  "path": "assets/preload-helper-DclECHGd.js",
+  "bytes": 1630
+ },
+ {
+  "path": "assets/registry-ChiJXsfH.js",
+  "bytes": 24
+ },
+ {
+  "path": "assets/rng-BiiOC8ay.js",
+  "bytes": 629
+ },
+ {
+  "path": "assets/sprite-DgG2QB37.js",
+  "bytes": 1015
+ },
+ {
+  "path": "assets/start-tIugQgGA.js",
+  "bytes": 126530
+ },
+ {
+  "path": "assets/typed-DWmzlOXH.js",
+  "bytes": 6913
+ },
+ {
+  "path": "assets/ui-BAPSsyyW.js",
+  "bytes": 7120
+ },
+ {
+  "path": "assets/uikit-D7wo2A9W.js",
+  "bytes": 2448
+ },
+ {
+  "path": "assets/uikit-Dd03ByGN.js",
+  "bytes": 64
+ },
+ {
+  "path": "audio/bgm.json",
+  "bytes": 1596
+ },
+ {
+  "path": "audio/bgm_p1.m4a",
+  "bytes": 2855462
+ },
+ {
+  "path": "audio/bgm_p2.m4a",
+  "bytes": 1594780
+ },
+ {
+  "path": "brand/logo-hd-hyundai.png",
+  "bytes": 5492
+ },
+ {
+  "path": "brand/logo-hyundai-rotem.png",
+  "bytes": 4856
+ },
+ {
+  "path": "brand/logo-korean-air.png",
+  "bytes": 7319
+ },
+ {
+  "path": "brand/logo-nc-ai.png",
+  "bytes": 2127
+ },
+ {
+  "path": "data/anim.json",
+  "bytes": 29329
+ },
+ {
+  "path": "data/anim_QUGV_LANDING.json",
+  "bytes": 28721
+ },
+ {
+  "path": "data/bust.f32",
+  "bytes": 196608
+ },
+ {
+  "path": "data/cams.json",
+  "bytes": 655356
+ },
+ {
+  "path": "data/gui.json",
+  "bytes": 828339
+ },
+ {
+  "path": "data/gui_base_1x.png",
+  "bytes": 607940
+ },
+ {
+  "path": "data/gui_base_2x.png",
+  "bytes": 1321071
+ },
+ {
+  "path": "data/hud_A.json",
+  "bytes": 57618
+ },
+ {
+  "path": "data/hud_B_phys.json",
+  "bytes": 323851
+ },
+ {
+  "path": "data/ingest_frames.jpg",
+  "bytes": 287281
+ },
+ {
+  "path": "data/ingest_frames.json",
+  "bytes": 2347
+ },
+ {
+  "path": "data/models/uav.glb",
+  "bytes": 62120
+ },
+ {
+  "path": "data/models/ugv.glb",
+  "bytes": 196092
+ },
+ {
+  "path": "data/models/usv.glb",
+  "bytes": 98948
+ },
+ {
+  "path": "data/p2hud_DC.bin",
+  "bytes": 1274552
+ },
+ {
+  "path": "data/p2hud_DC.json",
+  "bytes": 1890676
+ },
+ {
+  "path": "data/p2hud_P5.bin",
+  "bytes": 3018186
+ },
+ {
+  "path": "data/p2hud_P5.json",
+  "bytes": 3468032
+ },
+ {
+  "path": "data/p2ui.json",
+  "bytes": 264
+ },
+ {
+  "path": "data/p2ui_P2.json",
+  "bytes": 48041
+ },
+ {
+  "path": "data/p2ui_P3.json",
+  "bytes": 90087
+ },
+ {
+  "path": "data/p2ui_P4.json",
+  "bytes": 167945
+ },
+ {
+  "path": "data/p2ui_P6.json",
+  "bytes": 1268483
+ },
+ {
+  "path": "data/p2ui_base.json",
+  "bytes": 199014
+ },
+ {
+  "path": "data/p2ui_base_1x.png",
+  "bytes": 652760
+ },
+ {
+  "path": "data/p2ui_base_2x.png",
+  "bytes": 1442468
+ },
+ {
+  "path": "data/p2ui_map.json",
+  "bytes": 1547904
+ },
+ {
+  "path": "data/p6ui_base_1x.png",
+  "bytes": 634462
+ },
+ {
+  "path": "data/p6ui_base_2x.png",
+  "bytes": 1386771
+ },
+ {
+  "path": "data/plate_DC.json",
+  "bytes": 257
+ },
+ {
+  "path": "data/plate_DC_live.json",
+  "bytes": 382
+ },
+ {
+  "path": "data/plate_EL.json",
+  "bytes": 337
+ },
+ {
+  "path": "data/plate_P5.json",
+  "bytes": 419
+ },
+ {
+  "path": "data/plate_P5_live.json",
+  "bytes": 544
+ },
+ {
+  "path": "data/plates_data.json",
+  "bytes": 134963
+ },
+ {
+  "path": "data/s6_frames.json",
+  "bytes": 9176
+ },
+ {
+  "path": "data/screen_A.json",
+  "bytes": 6848
+ },
+ {
+  "path": "data/terrain/checkpoints.json",
+  "bytes": 88222
+ },
+ {
+  "path": "data/terrain/height_1025.u16",
+  "bytes": 2101250
+ },
+ {
+  "path": "data/terrain/terrain.json",
+  "bytes": 1416
+ },
+ {
+  "path": "data/terrain/world.json",
+  "bytes": 58317
+ },
+ {
+  "path": "index.html",
+  "bytes": 8086
+ },
+ {
+  "path": "plate_A_take1c_scrub.mp4",
+  "bytes": 10748603
+ },
+ {
+  "path": "plate_A_take1c_scrub_540.mp4",
+  "bytes": 1998827
+ },
+ {
+  "path": "plate_B_long_scrub.mp4",
+  "bytes": 50496621
+ },
+ {
+  "path": "plate_B_long_scrub_540.mp4",
+  "bytes": 8893226
+ },
+ {
+  "path": "plate_C1_take1c_scrub.mp4",
+  "bytes": 31927895
+ },
+ {
+  "path": "plate_C1_take1c_scrub_540.mp4",
+  "bytes": 5258644
+ },
+ {
+  "path": "plate_C2_seg_scrub.mp4",
+  "bytes": 16357420
+ },
+ {
+  "path": "plate_C2_seg_scrub_540.mp4",
+  "bytes": 3098573
+ },
+ {
+  "path": "plate_C3_seg_scrub.mp4",
+  "bytes": 9774425
+ },
+ {
+  "path": "plate_C3_seg_scrub_540.mp4",
+  "bytes": 1625052
+ },
+ {
+  "path": "plate_DC_take1_live_scrub.mp4",
+  "bytes": 29129748
+ },
+ {
+  "path": "plate_DC_take1_live_scrub_540.mp4",
+  "bytes": 6048546
+ },
+ {
+  "path": "plate_P5_take1_live_scrub.mp4",
+  "bytes": 67428022
+ },
+ {
+  "path": "plate_P5_take1_live_scrub_540.mp4",
+  "bytes": 12216035
+ },
+ {
+  "path": "plate_P6feed_scrub.mp4",
+  "bytes": 8080311
+ },
+ {
+  "path": "plate_P6feed_scrub_540.mp4",
+  "bytes": 1959401
+ },
+ {
+  "path": "plate_S6_scrub.mp4",
+  "bytes": 54192420
+ },
+ {
+  "path": "plate_S6_scrub_540.mp4",
+  "bytes": 7355246
+ }
+]

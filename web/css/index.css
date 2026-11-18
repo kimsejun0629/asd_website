@@ -12,7 +12,7 @@ main>section.sw{animation:none}   /* 첫 구역 흐림 등장(site.css) 대신 �
 .sw-cv,.sw-rail,.sw-tags{display:none}
 .sw-ch{padding:40px var(--m)}
 .sw-ch:first-of-type{padding-top:calc(var(--hdr) + 48px)}
-html.sw-on .sw{height:calc(100vh + 455vh);height:calc(100svh + 455svh)}   /* 100 + (4장 − 0.5) × 130 — swarm.js가 높이에서 한 장 거리를 거꾸로 셈 */
+html.sw-on .sw{height:calc(100vh + 585vh);height:calc(100svh + 585svh)}   /* 100 + (5장 − 0.5) × 130 — swarm.js가 높이에서 한 장 거리를 거꾸로 셈 */
 html.sw-on .sw-stage{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;background:radial-gradient(60% 70% at var(--cx,54%) 48%,rgb(var(--cblue-rgb) / .34),rgb(var(--night-rgb) / 0) 70%),var(--night)}   /* --cx: 형상 가운데(swarm.js) */
 html.sw-on .sw-stage::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgb(var(--night-rgb) / .86),rgb(var(--night-rgb) / .62) 26%,rgb(var(--night-rgb) / 0) 48%),linear-gradient(0deg,rgb(var(--night-rgb) / .7),rgb(var(--night-rgb) / 0) 22%)}
 html.sw-on .sw-cv{display:block;position:absolute;inset:0;width:100%;height:100%}
@@ -90,7 +90,7 @@ html.sw-on .sw-stage .scue{bottom:calc(74px + var(--sab))}
 html.sw-on .sw-rail{display:block;position:absolute;left:var(--m);right:var(--m);bottom:calc(24px + var(--sab));z-index:3}
 .sw-rail::before,.sw-rail::after{content:"";position:absolute;left:0;top:0;width:100%;height:1px;background:var(--line)}
 .sw-rail::after{background:var(--gold-hi);transform-origin:0 50%;transform:scaleX(var(--p,0))}
-.sw-rail ol{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin:0;padding:0;list-style:none}
+.sw-rail ol{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));margin:0;padding:0;list-style:none}
 .sw-rail button{display:flex;align-items:baseline;gap:10px;width:100%;padding:14px 12px 4px 0;border:0;background:none;color:var(--cream80);font:inherit;font-size:13px;text-align:left;cursor:pointer;transition:color var(--t-ui)}
 .sw-rail button i{font-style:normal;font-size:11px;font-weight:700;letter-spacing:.1em;font-variant-numeric:tabular-nums}
 .sw-rail button:hover,.sw-rail button[aria-current]{color:var(--cream)}
